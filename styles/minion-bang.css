@@ -1,0 +1,79 @@
+/* Scrolls past 620px, keeping the whole window under 750px. */
+.minion-bang-overkill-dialog {
+  max-width: 380px;
+  max-height: 620px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.minion-bang-overkill-dialog .minion-bang-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin-bottom: 0.5em;
+}
+
+.minion-bang-overkill-dialog .minion-bang-portrait {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-dark-tertiary, #444);
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list {
+  list-style: none;
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list li {
+  padding: 0.2em 0;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+}
+
+.minion-bang-overkill-dialog .minion-bang-thumb {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-name {
+  flex: 1 1 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-distance {
+  color: var(--color-text-dark-secondary, #888);
+  font-size: 0.9em;
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-shortfall {
+  color: var(--color-level-warning, #b8860b);
+  font-style: italic;
+}
+
+.minion-bang-overkill-dialog .minion-bang-empty {
+  color: var(--color-text-dark-secondary, #888);
+  font-style: italic;
+}
+
+/* Token HUD button, red while the actor is flagged as a minion. */
+.minion-bang-toggle.active i {
+  color: #ff3b30;
+}
+
+.minion-bang-overkill-dialog .minion-bang-opportunity {
+  display: flex;
+  gap: 1em;
+  margin: 0.25em 0 0.5em;
+}

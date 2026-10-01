@@ -1,0 +1,56 @@
+{
+  "MINIONBANG": {
+    "Unknown": "Unknown",
+    "Settings": {
+      "Debug": {
+        "Name": "Enable Debug",
+        "Hint": "Prints detailed step-by-step logs to the browser console for every minion damage event. Leave this off for normal play."
+      },
+      "Diagnostics": {
+        "Name": "Run Diagnostics",
+        "Label": "Run Diagnostics",
+        "Hint": "Runs a self-test of the module's rules engine and lets you download a report to share when asking for help."
+      }
+    },
+    "Flag": {
+      "Name": "Minion",
+      "Hint": "This actor is treated as a Minion by the Minion! module: reduced to 0 HP by the Minion trait, eligible for overkill.",
+      "Section": "Minion!"
+    },
+    "Hud": {
+      "Toggle": "Toggle Minion"
+    },
+    "Overkill": {
+      "Title": "Minion! - Overkill",
+      "Intro": "<strong>{attacker}</strong> hits <strong>{target}</strong> with <strong>{weapon}</strong> and deals enough damage to involve other minions.",
+      "OpportunityQuestion": "Was this an opportunity attack?",
+      "OpportunityNo": "No",
+      "OpportunityYes": "Yes (no overkill)",
+      "NoCandidates": "No other minion in range: overkill only affects the target already hit.",
+      "Shortfall": "The excess damage would be enough for {count} more minion(s), but there are no others in range.",
+      "Confirm": "Confirm",
+      "Cancel": "Cancel"
+    },
+    "Waiting": {
+      "Text": "Waiting for <strong>{player}</strong> to resolve <strong>{attacker}</strong>'s overkill.",
+      "APlayer": "a player",
+      "Decide": "Decide for them",
+      "Cancel": "Cancel overkill"
+    },
+    "Chat": {
+      "OneMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, one more enemy falls.",
+      "ManyMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, {count} more enemies fall."
+    },
+    "Notify": {
+      "SceneNotViewed": "Minion! overkill skipped: the GM is not viewing the scene where the attack happened."
+    },
+    "Diagnostics": {
+      "Title": "Minion! - Diagnostics",
+      "Passed": "Engine self-test: <strong>{passed}/{total}</strong> passed.",
+      "Failed": "Engine self-test: <strong>{passed}/{total}</strong> passed, <strong>{failed} failed</strong>. Please attach the full report when asking for help.",
+      "SaveHint": "Click \"Save Report\" to download the full diagnostics file.",
+      "Save": "Save Report",
+      "Close": "Close"
+    }
+  }
+}

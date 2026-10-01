@@ -1,0 +1,35 @@
+<div class="minion-bang-overkill-dialog">
+  <div class="minion-bang-header">
+    <img class="minion-bang-portrait" src="{{hitTokenImg}}" alt="{{hitTokenName}}">
+    <p>{{{introHtml}}}</p>
+  </div>
+
+  {{#if askOpportunityAttack}}
+  <fieldset class="minion-bang-opportunity">
+    <legend>{{localize "MINIONBANG.Overkill.OpportunityQuestion"}}</legend>
+    <label><input type="radio" name="minion-bang-opportunity" value="no" checked> {{localize "MINIONBANG.Overkill.OpportunityNo"}}</label>
+    <label><input type="radio" name="minion-bang-opportunity" value="yes"> {{localize "MINIONBANG.Overkill.OpportunityYes"}}</label>
+  </fieldset>
+  {{/if}}
+
+  {{#if candidates.length}}
+  <ul class="minion-bang-candidate-list">
+    {{#each candidates}}
+    <li>
+      <label>
+        <input type="checkbox" name="minion-bang-target" value="{{this.id}}" {{#if this.checked}}checked{{/if}}>
+        <img class="minion-bang-thumb" src="{{this.img}}" alt="">
+        <span class="minion-bang-name">{{this.name}}</span>
+        <span class="minion-bang-distance">{{this.distanceLabel}}</span>
+      </label>
+    </li>
+    {{/each}}
+  </ul>
+  {{else}}
+  <p class="minion-bang-empty">{{localize "MINIONBANG.Overkill.NoCandidates"}}</p>
+  {{/if}}
+
+  {{#if shortfall}}
+  <p class="minion-bang-shortfall">{{localize "MINIONBANG.Overkill.Shortfall" count=shortfall}}</p>
+  {{/if}}
+</div>

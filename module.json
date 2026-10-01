@@ -1,0 +1,64 @@
+{
+  "id": "minion-bang",
+  "title": "Minion!",
+  "description": "Automates the Minion trait and overkill rules for D&D 5e, integrated with Midi-QOL: minions die at 0 HP as they should, and a weapon attack that overkills a minion lets you pick which nearby minions fall with it, right on the map.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14.368"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "5.3.2",
+          "verified": "5.3.3",
+          "maximum": "5.3.99"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "socketlib",
+        "type": "module"
+      },
+      {
+        "id": "midi-qol",
+        "type": "module",
+        "compatibility": {
+          "minimum": "14.0.11"
+        },
+        "reason": "Minion! reads Midi-QOL's damage calculation to apply the Minion trait and detect overkill."
+      }
+    ]
+  },
+  "socket": true,
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/minion-bang.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "authors": [
+    {
+      "name": "TheRealSega",
+      "url": "https://github.com/therealsega87"
+    }
+  ],
+  "url": "https://github.com/therealsega87/minion-bang",
+  "manifest": "https://github.com/therealsega87/minion-bang/releases/latest/download/module.json",
+  "download": "https://github.com/therealsega87/minion-bang/releases/download/v1.0.0/module.zip",
+  "readme": "https://github.com/therealsega87/minion-bang/blob/main/README.md",
+  "bugs": "https://github.com/therealsega87/minion-bang/issues",
+  "changelog": "https://github.com/therealsega87/minion-bang/blob/main/CHANGELOG.md",
+  "license": "LICENSE"
+}
