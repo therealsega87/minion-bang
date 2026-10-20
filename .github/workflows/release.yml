@@ -7,14 +7,17 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
       - name: Engine self-test
         run: node tests/engine.test.mjs
       - name: Selection limit in the dialog
@@ -25,6 +28,8 @@ jobs:
         run: node tests/startup.test.mjs
       - name: Languages
         run: node tests/lang.test.mjs
+      - name: Manifest and release package
+        run: node tests/manifest.test.mjs
 
   release:
     if: github.event_name == 'release'
@@ -33,7 +38,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+
+      - name: Check that the tag matches the version in module.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          CURRENT="$(jq -r .version module.json)"
+          if [ "$VERSION" != "$CURRENT" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match module.json version $CURRENT"
+            exit 1
+          fi
 
       - name: Set version and download URL from the release tag
         run: |
