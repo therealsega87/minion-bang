@@ -32,6 +32,11 @@ export function debugLog(...args) {
   if (isDebugEnabled()) console.log(`%c[${MODULE_TITLE}]`, "color:#c77;font-weight:bold", ...args);
 }
 
+export function infoLog(...args) {
+  remember("info", args);
+  console.info(`[${MODULE_TITLE}]`, ...args);
+}
+
 export function warnLog(...args) {
   remember("warn", args);
   console.warn(`[${MODULE_TITLE}]`, ...args);

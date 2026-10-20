@@ -1,4 +1,3 @@
-![Downloads](https://img.shields.io/github/downloads/therealsega87/minion-bang/total?style=flat-square)
 # Minion!
 
 Minion rules for D&D 5e in Foundry VTT: the Minion trait and overkill, as described in MCDM's *Flee, Mortals!*, automated on top of Midi-QOL.
@@ -45,6 +44,12 @@ In Foundry, open **Add-on Modules**, choose **Install Module** and paste this ma
 https://github.com/therealsega87/minion-bang/releases/latest/download/module.json
 ```
 
+After updating the module, every connected player should reload the browser page with **Ctrl+F5**. A normal reload can keep serving the old files from the browser cache, and the dialogs then behave like the previous version.
+
+## Languages
+
+The interface is available in English and Italian. Foundry picks the language set in the user's settings.
+
 ## Usage
 
 ### Marking a minion
@@ -69,10 +74,11 @@ await actor.setFlag("dnd5e", "minionBangMinion", true);
 
 ### During play
 
-Attack minions as usual. When an attack deals damage to a minion, Minion! applies the Minion trait. If the attack was a weapon attack by a player character and the damage exceeds the minion's hit point maximum, the overkill dialog opens for the attacking player, or for the GM when that player isn't connected.
+Attack minions as usual. When an attack deals damage to a minion, Minion! applies the Minion trait. If the attack was a weapon attack by a player character and the damage exceeds the minion's hit point maximum, the overkill dialog opens for the attacking player, or for the GM when that player isn't connected. Minions that are hidden, or have the Invisible or Ethereal status, are never offered, and the others are listed with their token names.
 
 ## Settings
 
+- **Preselect the proposed minions** (world, on by default): when on, the overkill dialog opens with the nearest minions already checked. When off, nothing is checked and the player picks the minions; the limit still applies.
 - **Enable Debug** (per user): detailed logs in the browser console for every damage event on a minion.
 - **Run Diagnostics**: runs a self-test of the rules engine and lets you download a report with versions, settings and recent activity.
 

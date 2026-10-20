@@ -18,6 +18,15 @@ export function registerSettings() {
     default: false
   });
 
+  game.settings.register(MODULE_ID, "autoSelectProposal", {
+    name: "MINIONBANG.Settings.AutoSelect.Name",
+    hint: "MINIONBANG.Settings.AutoSelect.Hint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
   game.settings.registerMenu(MODULE_ID, "runDiagnostics", {
     name: "MINIONBANG.Settings.Diagnostics.Name",
     label: "MINIONBANG.Settings.Diagnostics.Label",

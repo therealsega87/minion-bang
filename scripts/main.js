@@ -3,7 +3,7 @@ import { registerDamageCapture } from "./adapters/damage-capture.js";
 import { initSocket } from "./net/socket.js";
 import { registerSettings } from "./settings.js";
 import { registerMinionCharacterFlag, registerMinionTokenHudToggle } from "./ui/minion-toggle.js";
-import { MODULE_TITLE, debugLog, errorLog } from "./log.js";
+import { MODULE_ID, MODULE_TITLE, infoLog, errorLog } from "./log.js";
 
 Hooks.once("socketlib.ready", () => initSocket());
 
@@ -19,6 +19,9 @@ Hooks.once("ready", () => {
   initSocket();
   registerDamageCapture();
 
+  const version = game.modules.get(MODULE_ID)?.version ?? "unknown";
+  infoLog(`${MODULE_TITLE} ${version} ready (${game.user.isGM ? "GM" : "player"}).`);
+
   if (!game.user.isGM) return;
 
   registerMinionTokenHudToggle();
@@ -30,6 +33,4 @@ Hooks.once("ready", () => {
       errorLog("Error while applying minion damage:", err);
     }
   });
-
-  debugLog(`${MODULE_TITLE} ready.`);
 });

@@ -9,6 +9,14 @@ import { opportunityAttackQuestion, killRecord, markDefeated } from "../combat-s
 
 const DEFAULT_IMAGE = "icons/svg/mystery-man.svg";
 
+function autoSelectEnabled() {
+  try {
+    return game.settings.get(MODULE_ID, "autoSelectProposal") !== false;
+  } catch {
+    return true;
+  }
+}
+
 const round1 = value => Math.round(value * 10) / 10;
 const listOrNone = items => (items.length ? items.join(", ") : "(none)");
 const describeKill = record => `killed by ${record?.attackerName ?? "unknown"}, `
@@ -74,25 +82,49 @@ function tokenCenter(token) {
   return { x: token.center?.x ?? token.x, y: token.center?.y ?? token.y };
 }
 
+const EXCLUDED_STATUS_IDS = ["invisible", "ethereal"];
+
+function excludingStatus(token) {
+  const statuses = token.actor?.statuses;
+  if (!statuses?.has) return null;
+  const ids = new Set(EXCLUDED_STATUS_IDS);
+  if (CONFIG.specialStatusEffects?.INVISIBLE) ids.add(CONFIG.specialStatusEffects.INVISIBLE);
+  return [...ids].find(id => statuses.has(id)) ?? null;
+}
+
+function concealmentReason(token) {
+  if (token.document?.hidden === true) return "hidden";
+  return excludingStatus(token);
+}
+
 function findSameStatBlockCandidates(hitToken, hitActor, excludedUuids = []) {
   const key = statBlockKey(hitActor);
   if (!key || !canvas.tokens) return [];
   const excluded = new Set(excludedUuids);
-  return canvas.tokens.placeables.filter(t => {
+  const concealed = [];
+  const found = canvas.tokens.placeables.filter(t => {
     if (t.id === hitToken?.id) return false;
     if (excluded.has(t.document?.uuid)) return false;
     if (!t.actor) return false;
     if (t.document?.combatant?.isDefeated) return false;
     if ((t.actor.system?.attributes?.hp?.value ?? 0) <= 0) return false;
     if (!isMinionActor(t.actor)) return false;
-    return statBlockKey(t.actor) === key;
+    if (statBlockKey(t.actor) !== key) return false;
+    const reason = concealmentReason(t);
+    if (reason) {
+      concealed.push(`${t.id} (${reason})`);
+      return false;
+    }
+    return true;
   });
+  if (concealed.length) debugLog(`Minions left out of the overkill (hidden or with an excluding status): ${concealed.join(", ")}.`);
+  return found;
 }
 
 function meleeCandidatesForToken(attackerToken, otherTokens) {
   return otherTokens.map(t => ({
     id: t.id,
-    name: t.actor?.name,
+    name: t.name,
     distanceFromAttacker: tokenDistance(attackerToken, t)
   }));
 }
@@ -114,7 +146,7 @@ function rangedCandidatesForToken(attackerToken, hitToken, otherTokens) {
     const vy = c.y - origin.y;
     return {
       id: t.id,
-      name: t.actor?.name,
+      name: t.name,
       alongLine: (vx * ux + vy * uy) * unitsPerPixel,
       perpendicular: Math.abs(vx * uy - vy * ux) * unitsPerPixel
     };
@@ -251,13 +283,13 @@ export function applyMinionDamage(actor, amount, updates, options) {
       id: c.id,
       uuid: token?.document?.uuid ?? null,
       distance: c.distance,
-      name: token?.actor?.name ?? c.id,
+      name: token?.name ?? token?.actor?.name ?? c.id,
       img: token?.document?.texture?.src ?? token?.actor?.img ?? DEFAULT_IMAGE
     };
   });
 
   debugLog(`Overkill: excess ${excess}, up to ${additionalCount} more minions.`);
-  debugLog(`Proposed: ${listOrNone(proposed.map(c => c.id))}. Shortfall: ${shortfall}.`);
+  debugLog(`Proposed: ${listOrNone(proposed.map(c => c.id))}. Shortfall: ${shortfall}. Preselected: ${autoSelectEnabled() ? "yes" : "no (setting off)"}.`);
   if (eligible.length === 0) return;
 
   const attackerActor = attackerToken.actor;
@@ -275,7 +307,8 @@ export function applyMinionDamage(actor, amount, updates, options) {
     others: withNames(otherEligible),
     distanceUnits: units,
     shortfall,
-    maxSelectable: additionalCount
+    maxSelectable: additionalCount,
+    autoSelect: autoSelectEnabled()
   };
 
   enqueueOverkill(decidingUserId, payload);
@@ -299,10 +332,20 @@ function resolveDecidingUserId(attackerActor) {
   return owner?.id ?? null;
 }
 
+async function announceNoOverkill(payload, emptyConfirm) {
+  const suffix = emptyConfirm ? "NoOverkillConfirmed" : "NoOverkill";
+  const attacker = payload.attackerName;
+  ui.notifications?.info(game.i18n.format(`MINIONBANG.Notify.${suffix}`, { attacker }));
+  await ChatMessage.create({
+    content: `<p>${game.i18n.format(`MINIONBANG.Chat.${suffix}`, { attacker: escapeHtml(attacker) })}</p>`
+  });
+}
+
 async function runOverkillConfirmation(decidingUserId, payload) {
   const answer = await requestOverkillConfirmation(decidingUserId, payload);
-  if (!answer) {
-    debugLog("Overkill cancelled.");
+  if (!answer || typeof answer !== "object") {
+    debugLog(`Overkill cancelled: ${payload.attackerName} decided not to overkill.`);
+    await announceNoOverkill(payload, false);
     return;
   }
   if (answer.opportunityAttack) {
@@ -310,7 +353,8 @@ async function runOverkillConfirmation(decidingUserId, payload) {
     return;
   }
   if (!Array.isArray(answer.selectedIds) || !answer.selectedIds.length) {
-    debugLog("No minion selected.");
+    debugLog(`No minion selected: ${payload.attackerName} pressed Confirm without choosing any minion.`);
+    await announceNoOverkill(payload, true);
     return;
   }
 

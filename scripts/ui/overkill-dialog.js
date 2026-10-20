@@ -16,12 +16,12 @@ function readAnswer(form) {
 
 export async function promptOverkillDialog(payload) {
   const { requestId, attackerName, hitTokenName, hitTokenImg, weaponName, proposed, others, shortfall,
-    maxSelectable, distanceUnits = "ft", askOpportunityAttack = false } = payload;
+    maxSelectable, autoSelect = true, distanceUnits = "ft", askOpportunityAttack = false } = payload;
   const limitText = selected => game.i18n.format("MINIONBANG.Overkill.Limit", { max: maxSelectable, selected });
   const formatDistance = d => `${Math.round(d * 10) / 10} ${distanceUnits}`;
 
   const candidates = [
-    ...proposed.map(c => ({ ...c, checked: true, distanceLabel: formatDistance(c.distance) })),
+    ...proposed.map(c => ({ ...c, checked: autoSelect, distanceLabel: formatDistance(c.distance) })),
     ...others.map(c => ({ ...c, checked: false, distanceLabel: formatDistance(c.distance) }))
   ];
 
@@ -33,10 +33,13 @@ export async function promptOverkillDialog(payload) {
 
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE_PATH, {
     introHtml, hitTokenName, hitTokenImg, candidates, shortfall, askOpportunityAttack,
-    limitText: limitText(proposed.length)
+    limitText: limitText(autoSelect ? proposed.length : 0)
   });
 
-  highlightCandidates(proposed.map(c => c.id), others.map(c => c.id));
+  const proposedIds = proposed.map(c => c.id);
+  const otherIds = others.map(c => c.id);
+  if (autoSelect) highlightCandidates(proposedIds, otherIds);
+  else highlightCandidates([], [...proposedIds, ...otherIds]);
 
   let result;
   try {
@@ -83,7 +86,7 @@ export async function promptOverkillDialog(payload) {
     clearHighlights();
   }
 
-  return result ?? null;
+  return result && typeof result === "object" ? result : null;
 }
 
 export function closeOverkillDialog(requestId) {

@@ -1,0 +1,66 @@
+{
+  "MINIONBANG": {
+    "Unknown": "Sconosciuto",
+    "Settings": {
+      "Debug": {
+        "Name": "Attiva Debug",
+        "Hint": "Scrive nella console del browser log dettagliati, passo per passo, per ogni danno subito da un minion. Lascialo spento durante il gioco normale."
+      },
+      "AutoSelect": {
+        "Name": "Preseleziona i minion proposti",
+        "Hint": "Se attiva, la finestra dell'overkill si apre con i minion più vicini già spuntati. Se spenta, nessun minion è spuntato e il giocatore sceglie quali colpire."
+      },
+      "Diagnostics": {
+        "Name": "Esegui Diagnostica",
+        "Label": "Esegui Diagnostica",
+        "Hint": "Esegue un autotest del motore delle regole del modulo e permette di scaricare un report da condividere quando si chiede aiuto."
+      }
+    },
+    "Flag": {
+      "Name": "Minion",
+      "Hint": "Questo attore è trattato come Minion dal modulo Minion!: ridotto a 0 PF dal tratto Minion, idoneo all'overkill.",
+      "Section": "Minion!"
+    },
+    "Hud": {
+      "Toggle": "Attiva/disattiva Minion"
+    },
+    "Overkill": {
+      "Title": "Minion! - Overkill",
+      "Intro": "<strong>{attacker}</strong> colpisce <strong>{target}</strong> con <strong>{weapon}</strong> e infligge danni sufficienti a coinvolgere altri minion.",
+      "OpportunityQuestion": "Era un attacco di opportunità?",
+      "OpportunityNo": "No",
+      "OpportunityYes": "Sì (nessun overkill)",
+      "NoCandidates": "Nessun altro minion a portata: l'overkill riguarda solo il bersaglio già colpito.",
+      "Limit": "Puoi selezionare al massimo {max} minion. Selezionati: {selected}.",
+      "Locked": "Gli attacchi di opportunità non causano overkill. Premi Conferma per chiudere.",
+      "Shortfall": "I danni in eccesso basterebbero per altri {count} minion, ma non ce ne sono altri a portata.",
+      "Confirm": "Conferma",
+      "Cancel": "Annulla"
+    },
+    "Waiting": {
+      "Text": "In attesa che <strong>{player}</strong> risolva l'overkill di <strong>{attacker}</strong>.",
+      "APlayer": "un giocatore",
+      "Decide": "Decidi al suo posto",
+      "Cancel": "Annulla overkill"
+    },
+    "Chat": {
+      "OneMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cade un altro nemico.",
+      "ManyMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cadono altri {count} nemici.",
+      "NoOverkill": "<strong>{attacker}</strong> ha deciso di non fare un Overkill.",
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> ha premuto Conferma ma non ha scelto nessun minion: nessun overkill."
+    },
+    "Notify": {
+      "SceneNotViewed": "Overkill di Minion! saltato: il GM non sta guardando la scena in cui è avvenuto l'attacco.",
+      "NoOverkill": "{attacker} ha deciso di non fare un Overkill.",
+      "NoOverkillConfirmed": "{attacker} ha premuto Conferma ma non ha scelto nessun minion: nessun overkill."
+    },
+    "Diagnostics": {
+      "Title": "Minion! - Diagnostica",
+      "Passed": "Autotest del motore: <strong>{passed}/{total}</strong> superati.",
+      "Failed": "Autotest del motore: <strong>{passed}/{total}</strong> superati, <strong>{failed} falliti</strong>. Allega il report completo quando chiedi aiuto.",
+      "SaveHint": "Clicca \"Salva report\" per scaricare il file di diagnostica completo.",
+      "Save": "Salva report",
+      "Close": "Chiudi"
+    }
+  }
+}

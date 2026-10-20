@@ -10,8 +10,8 @@ globalThis.Hooks = {
 };
 
 class FakeGraphics {
-  constructor() { this.destroyed = false; }
-  lineStyle() {}
+  constructor() { this.destroyed = false; this.alpha = null; }
+  lineStyle(width, color, alpha) { this.alpha = alpha; }
   drawCircle() {}
   destroy() { this.destroyed = true; }
 }
@@ -29,8 +29,9 @@ globalThis.document = {
 
 const registry = new Map();
 globalThis.fromUuidSync = uuid => registry.get(uuid) ?? null;
-globalThis.ui = { notifications: { warn() {}, info() {} } };
-globalThis.CONFIG = { specialStatusEffects: { DEFEATED: "dead" } };
+const notices = [];
+globalThis.ui = { notifications: { warn() {}, info: text => { notices.push(text); } } };
+globalThis.CONFIG = { specialStatusEffects: { DEFEATED: "dead", INVISIBLE: "invisible" } };
 
 const chat = [];
 globalThis.ChatMessage = { create: async data => { chat.push(data); } };
@@ -48,11 +49,11 @@ globalThis.MidiQOL = {
   computeDistance: (a, b) => (Math.max(Math.abs(a.center.x - b.center.x), Math.abs(a.center.y - b.center.y)) / 100) * 5
 };
 
-const dialogState = { template: null, script: null, forced: null, result: null };
+const dialogState = { autoSelect: true, template: null, script: null, forced: null, cancel: false, closeWithX: false, result: null };
 
 globalThis.game = {
   modules: { get: () => ({ active: true }) },
-  settings: { get: () => false },
+  settings: { get: (module, key) => (key === "autoSelectProposal" ? dialogState.autoSelect : false) },
   i18n: {
     localize: key => key,
     format: (key, data) => `${key} ${JSON.stringify(data)}`
@@ -121,10 +122,14 @@ globalThis.foundry = {
             },
             querySelectorAll: selector => (selector.includes("opportunity") ? radios : inputs)
           };
+          dialogState.ringsAtOpen = canvasTokens.map(t => t.rings.filter(g => !g.destroyed).map(g => g.alpha));
           config.render(null, { element });
           dialogState.limitLine = limitLine;
           dialogState.list = list;
           dialogState.inputs = inputs;
+          const press = async button => (await button.callback?.(null, { form: null }, null)) ?? button.action;
+          if (dialogState.closeWithX) return null;
+          if (dialogState.cancel) return press(config.buttons.find(b => b.action === "cancel"));
           if (dialogState.forced) return { selectedIds: dialogState.forced, opportunityAttack: false };
           for (const step of dialogState.script ?? []) {
             if (typeof step === "number") inputs[step].click();
@@ -134,7 +139,7 @@ globalThis.foundry = {
             querySelectorAll: selector => (selector.includes(":checked") ? inputs.filter(i => i.checked) : inputs),
             querySelector: selector => (selector.includes("opportunity") ? radios.find(r => r.checked) ?? null : null)
           };
-          return config.buttons[0].callback(null, { button: { form }, form });
+          return press({ ...config.buttons[0], callback: () => config.buttons[0].callback(null, { form }, null) });
         }
       }
     }
@@ -173,7 +178,8 @@ function makeToken(id, name, gx, gy, { type = "npc", minion = true } = {}) {
     y: gy * 100,
     w: 100,
     h: 100,
-    addChild() {}
+    rings: [],
+    addChild(graphics) { this.rings.push(graphics); }
   };
   token.document = {
     uuid: `Scene.s.Token.${id}`,
@@ -189,10 +195,14 @@ function makeToken(id, name, gx, gy, { type = "npc", minion = true } = {}) {
   return token;
 }
 
-async function runScenario({ damage, script = [], forced = null }) {
+async function runScenario({ damage, script = [], forced = null, cancel = false, closeWithX = false, autoSelect = true, tweak = null }) {
   canvasTokens.length = 0;
   registry.clear();
   chat.length = 0;
+  notices.length = 0;
+  dialogState.cancel = cancel;
+  dialogState.autoSelect = autoSelect;
+  dialogState.closeWithX = closeWithX;
   dialogState.template = null;
   dialogState.script = script;
   dialogState.forced = forced;
@@ -205,6 +215,8 @@ async function runScenario({ damage, script = [], forced = null }) {
     makeToken("g3", "Goblin Lackey", -1, 0),
     makeToken("g4", "Goblin Lackey", -1, 1)
   ];
+
+  if (tweak) tweak({ attacker, hit, others });
 
   const workflow = {
     activity: { type: "attack", getActionType: () => "mwak" },
@@ -227,7 +239,7 @@ async function runScenario({ damage, script = [], forced = null }) {
   await new Promise(r => setTimeout(r, 50));
 
   const killed = others.filter(t => t.actor.updates.length > 0).map(t => t.id);
-  return { updates, killed, template: dialogState.template, limitLine: dialogState.limitLine, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat] };
+  return { updates, killed, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
 }
 
 let failures = 0;
@@ -293,6 +305,144 @@ function check(label, actual, expected) {
 {
   const r = await runScenario({ damage: 19, script: [3, "yes", "no", 0] });
   check("19 damage: g4 checked, Yes, No, g1 checked -> limit 3 still holds, oldest (g2) dropped", r.killed, ["g1", "g3", "g4"]);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    tweak: ({ others }) => { others[0].name = "Shadow"; others[0].document.name = "Shadow"; }
+  });
+  check("renamed token: the dialog shows the token name", r.template.candidates.map(c => c.name)[0], "Shadow");
+  check("renamed token: the actor name is not shown", r.template.candidates.some(c => c.name === "Goblin Lackey" && c.id === "g1"), false);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    tweak: ({ others }) => { others[0].document.hidden = true; }
+  });
+  check("hidden token: not offered", r.template.candidates.map(c => c.id), ["g2", "g3", "g4"]);
+  check("hidden token: the next nearest is preselected", r.template.candidates.filter(c => c.checked).map(c => c.id), ["g2"]);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    tweak: ({ others }) => { others[1].actor.statuses.add("invisible"); }
+  });
+  check("invisible actor: not offered", r.template.candidates.map(c => c.id), ["g1", "g3", "g4"]);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    tweak: ({ others }) => { others[0].actor.statuses.add("ethereal"); }
+  });
+  check("ethereal actor: not offered", r.template.candidates.map(c => c.id), ["g2", "g3", "g4"]);
+  const logged = logModule.getRecentLogs().some(l => l.text.includes("g1 (ethereal)"));
+  check("ethereal actor: the log names the status", logged, true);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    tweak: ({ others }) => { others[0].actor.statuses.add("prone"); }
+  });
+  check("other statuses (prone) do not exclude a candidate", r.template.candidates.map(c => c.id), ["g1", "g2", "g3", "g4"]);
+}
+
+{
+  const r = await runScenario({
+    damage: 19,
+    tweak: ({ others }) => {
+      others[0].document.hidden = true;
+      others[1].actor.statuses.add("invisible");
+    }
+  });
+  check("hidden and invisible: only the visible ones remain", r.template.candidates.map(c => c.id), ["g3", "g4"]);
+  check("hidden and invisible: the shortfall counts what is missing", r.template.shortfall, 1);
+}
+
+{
+  const r = await runScenario({
+    damage: 10,
+    forced: ["g1"],
+    tweak: ({ others }) => { others[0].document.hidden = true; }
+  });
+  check("forged answer naming a hidden minion: ignored", r.killed, []);
+}
+
+{
+  const x = await runScenario({ damage: 10, closeWithX: true });
+  check("X: one chat message, the plain one", x.chat.length === 1 && x.chat[0].content.includes("MINIONBANG.Chat.NoOverkill ") && x.notices.length === 1, true);
+  check("X: nobody else is killed", x.killed, []);
+}
+
+{
+  const r = await runScenario({ damage: 10, cancel: true });
+  check("Cancel button: the hit minion still dies", r.updates["system.attributes.hp.value"], 0);
+  check("Cancel button: nobody else is killed", r.killed, []);
+  check("Cancel button: one public chat message naming the attacker", r.chat.length === 1 && r.chat[0].content.includes("MINIONBANG.Chat.NoOverkill ") && r.chat[0].content.includes("Akra"), true);
+  check("Cancel button: one notification for the GM", r.notices.length === 1 && r.notices[0].includes("MINIONBANG.Notify.NoOverkill ") && r.notices[0].includes("Akra"), true);
+  const logged = logModule.getRecentLogs().some(l => l.text.includes("Akra decided not to overkill"));
+  check("Cancel button: the log says who decided", logged, true);
+}
+
+{
+  const r = await runScenario({ damage: 10, script: [0] });
+  check("Confirm with no minion chosen: nobody else is killed", r.killed, []);
+  check("Confirm with no minion chosen: the chat says Confirm was pressed", r.chat.length === 1 && r.chat[0].content.includes("MINIONBANG.Chat.NoOverkillConfirmed"), true);
+  check("Confirm with no minion chosen: the notification says so too", r.notices.length === 1 && r.notices[0].includes("MINIONBANG.Notify.NoOverkillConfirmed"), true);
+}
+
+{
+  const r = await runScenario({ damage: 10, script: ["yes"] });
+  check("opportunity attack Yes: no 'decided not to overkill' message", r.chat.length === 0 && r.notices.length === 0, true);
+}
+
+{
+  const r = await runScenario({ damage: 10 });
+  check("regular overkill: only the overkill message, no 'decided not' text", r.chat.length === 1 && r.chat[0].content.includes("OneMore") && r.notices.length === 0, true);
+}
+
+{
+  const r = await runScenario({ damage: 10 });
+  check("preselection on: the nearest is checked and its ring is solid", r.template.candidates.map(c => c.checked), [true, false, false, false]);
+  check("preselection on: rings at open (attacker, hit, g1..g4)", r.ringsAtOpen.slice(2), [[0.9], [0.3], [0.3], [0.3]]);
+}
+
+{
+  const r = await runScenario({ damage: 10, autoSelect: false });
+  check("preselection off: nothing is checked", r.template.candidates.map(c => c.checked), [false, false, false, false]);
+  check("preselection off: every candidate is listed, nearest first", r.template.candidates.map(c => c.id), ["g1", "g2", "g3", "g4"]);
+  check("preselection off: the limit line starts at 0 selected", r.template.limitText.includes('"selected":0') && r.template.limitText.includes('"max":1'), true);
+  check("preselection off: every ring is faint", r.ringsAtOpen.slice(2), [[0.3], [0.3], [0.3], [0.3]]);
+  check("preselection off: Confirm without choosing says so", r.chat.length === 1 && r.chat[0].content.includes("NoOverkillConfirmed") && r.killed.length === 0, true);
+}
+
+{
+  const r = await runScenario({ damage: 10, autoSelect: false, script: [2] });
+  check("preselection off: the player picks one minion and it falls", r.killed, ["g3"]);
+}
+
+{
+  const r = await runScenario({ damage: 10, autoSelect: false, script: [2, 3] });
+  check("preselection off: the limit still replaces the oldest pick", r.killed, ["g4"]);
+}
+
+{
+  const r = await runScenario({ damage: 19, autoSelect: false, script: [0, 1, 2, 3] });
+  check("preselection off, limit 3: four picks keep the last three", r.killed, ["g2", "g3", "g4"]);
+}
+
+{
+  const r = await runScenario({ damage: 10, autoSelect: false, script: ["yes", "no", 1] });
+  check("preselection off: Yes then No restores an empty selection, then a pick works", r.killed, ["g2"]);
+}
+
+{
+  const r = await runScenario({ damage: 10, autoSelect: false, script: ["yes"] });
+  check("preselection off with opportunity attack Yes: no message, nobody falls", r.chat.length === 0 && r.killed.length === 0, true);
 }
 
 {

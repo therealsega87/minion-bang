@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+- World setting "Preselect the proposed minions" (on by default). When it is off, the overkill dialog opens with no minion checked, every candidate is listed from the nearest to the farthest, and all the map rings are faint. The limit on how many minions can be chosen and the replacement of the oldest choice work as before. If Confirm is pressed with no minion chosen, the chat says so.
+- The diagnostics report lists the new setting.
+
+## 1.1.1
+
+### Fixed
+- Pressing Cancel in the overkill dialog was treated as "Confirm pressed with no minion chosen". It now counts as a cancellation, and the chat message and the notification say that the character decided not to overkill.
+
+## 1.1.0
+
+### Added
+- When the overkill is not carried out, a public chat message and a notification for the GM say so: "[Character] decided not to overkill." This happens with Cancel, with the close button of the dialog and with the GM's "Cancel overkill".
+- If Confirm is pressed without choosing any minion, the message says exactly that.
+- Italian translation (`lang/it.json`). Foundry uses it when the user's language is Italian and falls back to English for anything missing.
+
+### Notes
+- Answering "Yes" to the opportunity attack question does not produce the message: no overkill is the rule there, not a decision.
+
+## 1.0.4
+
+### Changed
+- Minions whose actor has the Ethereal status are never offered as overkill candidates, like hidden and invisible ones.
+
+## 1.0.3
+
+### Changed
+- The overkill dialog lists minions by their token names instead of the actor names, so a renamed token no longer reveals what it is.
+- Hidden tokens and tokens whose actor has the Invisible condition are never offered as overkill candidates, whoever is deciding.
+- The module version is written to the browser console on every client when the world starts, which makes it easy to check which files a player is running.
+
 ## 1.0.2
 
 ### Changed

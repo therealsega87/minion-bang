@@ -6,6 +6,10 @@
         "Name": "Enable Debug",
         "Hint": "Prints detailed step-by-step logs to the browser console for every minion damage event. Leave this off for normal play."
       },
+      "AutoSelect": {
+        "Name": "Preselect the proposed minions",
+        "Hint": "When on, the overkill dialog opens with the nearest minions already checked. When off, nothing is checked and the player picks the minions."
+      },
       "Diagnostics": {
         "Name": "Run Diagnostics",
         "Label": "Run Diagnostics",
@@ -41,10 +45,14 @@
     },
     "Chat": {
       "OneMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, one more enemy falls.",
-      "ManyMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, {count} more enemies fall."
+      "ManyMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, {count} more enemies fall.",
+      "NoOverkill": "<strong>{attacker}</strong> decided not to overkill.",
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> pressed Confirm but chose no minion: no overkill."
     },
     "Notify": {
-      "SceneNotViewed": "Minion! overkill skipped: the GM is not viewing the scene where the attack happened."
+      "SceneNotViewed": "Minion! overkill skipped: the GM is not viewing the scene where the attack happened.",
+      "NoOverkill": "{attacker} decided not to overkill.",
+      "NoOverkillConfirmed": "{attacker} pressed Confirm but chose no minion: no overkill."
     },
     "Diagnostics": {
       "Title": "Minion! - Diagnostics",

@@ -17,11 +17,16 @@ function gatherVersions() {
 }
 
 function gatherSettings() {
-  try {
-    return { "Debug logging": game.settings.get(MODULE_ID, "debugLogging") };
-  } catch {
-    return {};
+  const settings = {};
+  const entries = [["Debug logging", "debugLogging"], ["Preselect the proposed minions", "autoSelectProposal"]];
+  for (const [label, key] of entries) {
+    try {
+      settings[label] = game.settings.get(MODULE_ID, key);
+    } catch {
+      settings[label] = "unavailable";
+    }
   }
+  return settings;
 }
 
 function buildReportText(versions, settings, selfTest, logs) {
