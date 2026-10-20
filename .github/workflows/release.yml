@@ -17,6 +17,10 @@ jobs:
           node-version: 20
       - name: Engine self-test
         run: node tests/engine.test.mjs
+      - name: Selection limit in the dialog
+        run: node tests/selection-binding.test.mjs
+      - name: GM flow with simulated Foundry objects
+        run: node tests/gm-flow.test.mjs
 
   release:
     if: github.event_name == 'release'
