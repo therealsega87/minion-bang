@@ -1,3 +1,5 @@
+![Downloads](https://img.shields.io/github/downloads/therealsega87/minion-bang/total?style=flat-square)
+
 # Minion!
 
 Minion rules for D&D 5e in Foundry VTT: the Minion trait and overkill, as described in MCDM's *Flee, Mortals!*, automated on top of Midi-QOL.
