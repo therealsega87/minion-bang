@@ -1,9 +1,3 @@
-/**
- * Logging helpers. debugLog prints only when "Enable Debug" is on;
- * warnLog and errorLog always print. Every entry is also kept in a small
- * buffer that "Run Diagnostics" attaches to its report.
- */
-
 export const MODULE_ID = "minion-bang";
 export const MODULE_TITLE = "Minion!";
 
@@ -48,7 +42,6 @@ export function errorLog(...args) {
   console.error(`[${MODULE_TITLE}]`, ...args);
 }
 
-/** Recent log entries, oldest first. */
 export function getRecentLogs() {
   return [...buffer];
 }

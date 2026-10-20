@@ -1,4 +1,3 @@
-// Run from the repository root: node tests/engine.test.mjs
 import { runEngineSelfTests } from "../scripts/engine/self-test.js";
 
 const { passed, failed, total, cases } = runEngineSelfTests();

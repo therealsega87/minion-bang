@@ -6,11 +6,6 @@ function combatantFor(tokenDocument) {
   return combat.getCombatantsByToken?.(tokenDocument)?.[0] ?? null;
 }
 
-/**
- * Overkill can't come from an opportunity attack. The question is asked
- * outside combat, and in combat when it isn't the attacker's turn.
- * @returns {{ask: boolean, reason: string}}
- */
 export function opportunityAttackQuestion(attackerTokenDocument) {
   const combat = game.combat;
   const combatant = combatantFor(attackerTokenDocument);
@@ -19,7 +14,6 @@ export function opportunityAttackQuestion(attackerTokenDocument) {
   return { ask: false, reason: "attacker's own turn" };
 }
 
-/** Who killed a minion and when. Stored as flags.minion-bang.killedBy. */
 export function killRecord(attackerTokenUuid, attackerName) {
   const combat = game.combat?.started ? game.combat : null;
   return {
@@ -31,17 +25,12 @@ export function killRecord(attackerTokenUuid, attackerName) {
   };
 }
 
-/** What Midi-QOL already does on its own when an NPC drops to 0 HP. */
 function midiDefeatHandling() {
   const settings = globalThis.MidiQOL?.configSettings?.() ?? {};
   const deadStatus = !!settings.addDead && settings.addDead !== "none";
   return { deadStatus, defeated: deadStatus && settings.markNonPlayerDefeated === true };
 }
 
-/**
- * Applies the Dead status and, in combat, the defeated mark. Whatever
- * Midi-QOL already handles is left to it, so the two never collide.
- */
 export async function markDefeated(tokenDocument) {
   const actor = tokenDocument?.actor;
   if (!actor) return;

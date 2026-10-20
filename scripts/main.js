@@ -16,8 +16,6 @@ Hooks.once("i18nInit", () => {
 });
 
 Hooks.once("ready", () => {
-  // Needed on every client: damage is captured where the attack is made,
-  // and the overkill dialog may open on a player's client.
   initSocket();
   registerDamageCapture();
 
@@ -27,7 +25,6 @@ Hooks.once("ready", () => {
 
   Hooks.on("dnd5e.preApplyDamage", (actor, amount, updates, options) => {
     try {
-      // Returning false cancels the hit point update.
       return applyMinionDamage(actor, amount, updates, options);
     } catch (err) {
       errorLog("Error while applying minion damage:", err);

@@ -1,8 +1,6 @@
 import { MODULE_ID } from "./log.js";
 import { runDiagnostics } from "./diagnostics.js";
 
-// registerMenu expects an Application class; this one opens the
-// diagnostics dialog instead of a window of its own.
 class DiagnosticsMenu extends foundry.applications.api.ApplicationV2 {
   async render() {
     await runDiagnostics();

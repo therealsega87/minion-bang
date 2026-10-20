@@ -1,17 +1,8 @@
-/**
- * Runs on the attacking client. Midi-QOL calculates each target's damage in
- * three passes (default, other, bonus), in that order, after resistances,
- * immunities and saving throws. The totals and the attack details are
- * attached to the default pass options, which Midi-QOL forwards to the GM.
- */
-
 const NON_DAMAGE_TYPES = new Set(["healing", "temphp"]);
 const PASSES = ["default", "other", "bonus"];
 
-/** targetTokenUuid -> details of the latest attack against that token */
 const attackByTarget = new Map();
 
-/** targetTokenUuid -> passes calculated so far */
 const passesByTarget = new Map();
 
 function buildAttackDetails(workflow) {
@@ -41,7 +32,6 @@ function sumDamage(damages) {
     .reduce((total, d) => total + (Number(d.value) || 0), 0);
 }
 
-/** Healing may arrive as negative values. */
 function sumOfType(damages, type) {
   return (damages ?? [])
     .filter(d => d.type === type)

@@ -1,10 +1,6 @@
-/**
- * Overkill confirmation dialog. closeOverkillDialog() closes it when the
- * decision has been made elsewhere.
- */
-
 import { highlightCandidates, setCandidateStrength, clearHighlights } from "./map-highlight.js";
-import { MODULE_ID, escapeHtml } from "../log.js";
+import { bindSelectionLimit } from "./selection-binding.js";
+import { MODULE_ID, debugLog, escapeHtml } from "../log.js";
 
 const TEMPLATE_PATH = `modules/${MODULE_ID}/templates/overkill-dialog.hbs`;
 const openOverkillDialogs = new Map();
@@ -18,23 +14,10 @@ function readAnswer(form) {
   };
 }
 
-/**
- * @param {Object} payload
- * @param {string} [payload.requestId]
- * @param {string} payload.attackerName
- * @param {string} payload.hitTokenName
- * @param {string} payload.hitTokenImg
- * @param {string} payload.weaponName
- * @param {Array<{id: string, name: string, img: string, distance: number}>} payload.proposed  Checked by default.
- * @param {Array<{id: string, name: string, img: string, distance: number}>} payload.others    Unchecked by default.
- * @param {number} payload.shortfall
- * @param {string} payload.distanceUnits
- * @param {boolean} payload.askOpportunityAttack
- * @returns {Promise<{selectedIds: string[], opportunityAttack: boolean}|null>}
- */
 export async function promptOverkillDialog(payload) {
   const { requestId, attackerName, hitTokenName, hitTokenImg, weaponName, proposed, others, shortfall,
-    distanceUnits = "ft", askOpportunityAttack = false } = payload;
+    maxSelectable, distanceUnits = "ft", askOpportunityAttack = false } = payload;
+  const limitText = selected => game.i18n.format("MINIONBANG.Overkill.Limit", { max: maxSelectable, selected });
   const formatDistance = d => `${Math.round(d * 10) / 10} ${distanceUnits}`;
 
   const candidates = [
@@ -49,7 +32,8 @@ export async function promptOverkillDialog(payload) {
   });
 
   const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE_PATH, {
-    introHtml, hitTokenName, hitTokenImg, candidates, shortfall, askOpportunityAttack
+    introHtml, hitTokenName, hitTokenImg, candidates, shortfall, askOpportunityAttack,
+    limitText: limitText(proposed.length)
   });
 
   highlightCandidates(proposed.map(c => c.id), others.map(c => c.id));
@@ -73,8 +57,24 @@ export async function promptOverkillDialog(payload) {
       rejectClose: false,
       render: (event, dialog) => {
         if (requestId) openOverkillDialogs.set(requestId, dialog);
-        dialog.element.querySelectorAll('input[name="minion-bang-target"]').forEach(input => {
-          input.addEventListener("change", () => setCandidateStrength(input.value, input.checked));
+        const limitLine = dialog.element.querySelector(".minion-bang-limit");
+        const list = dialog.element.querySelector(".minion-bang-candidates");
+        const allIds = [...proposed, ...others].map(c => c.id);
+        bindSelectionLimit(dialog.element, {
+          max: maxSelectable,
+          onChange: (id, checked) => setCandidateStrength(id, checked),
+          onCount: count => { if (limitLine) limitLine.textContent = limitText(count); },
+          onLockChange: (locked, selectedIds) => {
+            list?.classList.toggle("minion-bang-locked", locked);
+            if (locked) {
+              clearHighlights();
+              if (limitLine) limitLine.textContent = game.i18n.localize("MINIONBANG.Overkill.Locked");
+              debugLog("Opportunity attack chosen in the dialog: overkill choices locked.");
+            } else {
+              highlightCandidates(selectedIds, allIds.filter(id => !selectedIds.includes(id)));
+              debugLog("Opportunity attack unchosen in the dialog: overkill choices restored.");
+            }
+          }
         });
       }
     });

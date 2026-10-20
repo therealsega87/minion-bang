@@ -1,10 +1,7 @@
-/** Shown to the GM while a player resolves an overkill. */
-
 import { escapeHtml } from "../log.js";
 
 const openWaitingDialogs = new Map();
 
-/** @returns {Promise<"decide"|"cancel"|null>} */
 export async function promptWaitingDialog({ requestId, playerName, attackerName }) {
   const result = await foundry.applications.api.DialogV2.wait({
     window: { title: "MINIONBANG.Overkill.Title", icon: "fa-solid fa-hourglass-half" },

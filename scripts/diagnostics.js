@@ -1,8 +1,3 @@
-/**
- * Diagnostics report for bug reports: versions, settings, engine
- * self-test results and recent log entries.
- */
-
 import { runEngineSelfTests } from "./engine/self-test.js";
 import { getRecentLogs, MODULE_ID, MODULE_TITLE } from "./log.js";
 
@@ -55,7 +50,6 @@ function buildReportText(versions, settings, selfTest, logs) {
   return lines.join("\n");
 }
 
-/** Shows a summary and offers the full report as a .log file. */
 export async function runDiagnostics() {
   const versions = gatherVersions();
   const settings = gatherSettings();

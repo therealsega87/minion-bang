@@ -27,6 +27,8 @@
       "OpportunityNo": "No",
       "OpportunityYes": "Yes (no overkill)",
       "NoCandidates": "No other minion in range: overkill only affects the target already hit.",
+      "Limit": "You can select at most {max} minion(s). Selected: {selected}.",
+      "Locked": "Opportunity attacks cause no overkill. Press Confirm to close.",
       "Shortfall": "The excess damage would be enough for {count} more minion(s), but there are no others in range.",
       "Confirm": "Confirm",
       "Cancel": "Cancel"

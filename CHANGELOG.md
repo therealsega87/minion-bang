@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.2
+
+### Changed
+- In the overkill dialog, answering "Yes" to the opportunity attack question now greys out the list of minions at once: the boxes are disabled and unchecked, the map rings disappear and the limit line explains that opportunity attacks cause no overkill. Answering "No" again restores the previous selection and rings.
+
+## 1.0.1
+
+### Fixed
+- The overkill dialog now limits the selection to the number of extra minions the damage can take down (for example 10 damage on a 6 HP minion allows 1). Checking a new box when the limit is reached unchecks the oldest checked one, and the map rings follow.
+- The dialog shows the maximum and the current number of selected minions.
+- The GM side also enforces the limit: if an answer carries more minions than allowed, only the nearest ones are defeated and a warning is logged.
+
+### Changed
+- New automated tests for the selection limit and for the whole GM flow (damage capture, Minion trait, overkill dialog, defeated minions).
+
 ## 1.0.0
 
 First public release.

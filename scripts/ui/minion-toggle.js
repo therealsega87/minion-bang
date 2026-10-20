@@ -1,12 +1,5 @@
-/**
- * The "Minion" checkbox in Special Traits and the Token HUD button share
- * the same flag. On an unlinked token the HUD button changes that token's
- * own actor data, not the base actor.
- */
-
 import { MINION_FLAG_KEY, hasManualMinionFlag, toggleManualMinionFlag } from "../minion-flags.js";
 
-/** Runs on "i18nInit" so the labels can be localized. */
 export function registerMinionCharacterFlag() {
   CONFIG.DND5E.characterFlags[MINION_FLAG_KEY] = {
     name: game.i18n.localize("MINIONBANG.Flag.Name"),

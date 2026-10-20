@@ -1,16 +1,9 @@
-/**
- * Sends the overkill decision to the right client. While a player decides,
- * the GM can take over or cancel: the first answer wins and the other
- * window is closed.
- */
-
 import { promptOverkillDialog, closeOverkillDialog } from "../ui/overkill-dialog.js";
 import { promptWaitingDialog, closeWaitingDialog } from "../ui/waiting-dialog.js";
 import { MODULE_ID, debugLog, warnLog } from "../log.js";
 
 let socket = null;
 
-/** Registers only on the first call. */
 export function initSocket() {
   if (socket) return;
   if (typeof socketlib === "undefined") {
@@ -22,11 +15,6 @@ export function initSocket() {
   socket.register("closeOverkill", (requestId) => closeOverkillDialog(requestId));
 }
 
-/**
- * @param {string|null} userId  The player who should decide, or null if the GM decides.
- * @param {Object} payload  See promptOverkillDialog.
- * @returns {Promise<{selectedIds: string[], opportunityAttack: boolean}|null>}
- */
 export async function requestOverkillConfirmation(userId, payload) {
   if (!userId || userId === game.user.id || !socket) {
     if (userId && !socket) warnLog("socketlib unavailable: the GM decides instead of the player.");

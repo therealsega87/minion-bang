@@ -1,16 +1,9 @@
-/**
- * Rings around overkill candidates, drawn only on the local canvas so that
- * only the user who is deciding sees them. Solid for the proposed minions,
- * faint for the other candidates.
- */
-
 const RING_COLOR = 0xff3b30;
 const STRONG_ALPHA = 0.9;
 const WEAK_ALPHA = 0.3;
 const STRONG_WIDTH = 4;
 const WEAK_WIDTH = 2;
 
-/** tokenId -> ring graphics */
 const activeRings = new Map();
 
 function drawRing(token, { alpha, width }) {
@@ -22,10 +15,6 @@ function drawRing(token, { alpha, width }) {
   return graphics;
 }
 
-/**
- * @param {string[]} strongIds  Proposed candidates.
- * @param {string[]} weakIds    Other candidates.
- */
 export function highlightCandidates(strongIds, weakIds) {
   clearHighlights();
   for (const id of strongIds) {
@@ -41,7 +30,6 @@ export function highlightCandidates(strongIds, weakIds) {
   }
 }
 
-/** Updates a ring when its checkbox is toggled. */
 export function setCandidateStrength(tokenId, strong) {
   const existing = activeRings.get(tokenId);
   if (existing) {

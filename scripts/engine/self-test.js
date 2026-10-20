@@ -1,20 +1,12 @@
-/**
- * Rules engine test cases, shared by tests/engine.test.mjs and the
- * "Run Diagnostics" tool. No Foundry or Node.js dependencies.
- */
-
 import { resolveMinionTrait, toHpInstruction } from "./minion-trait.js";
 import { computeOverkill, proposeOverkillTargets } from "./overkill.js";
 import { filterMeleeCandidates, filterRangedLineCandidates } from "./geometry.js";
+import { applySelectionChange, clampSelection } from "./selection-limit.js";
 
 function deepEqual(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
-/**
- * A case that throws is reported as a failure instead of stopping the run.
- * @returns {{passed: number, failed: number, total: number, cases: Array<Object>}}
- */
 export function runEngineSelfTests() {
   const cases = [];
 
@@ -26,8 +18,6 @@ export function runEngineSelfTests() {
       cases.push({ label, pass: false, expected, actual: undefined, error: err.message });
     }
   }
-
-  // Minion trait
 
   check(
     "attackHit with 1 damage kills the minion",
@@ -70,8 +60,6 @@ export function runEngineSelfTests() {
     () => toHpInstruction(resolveMinionTrait({ origin: "otherEffect", effectiveDamage: 3, hpMax: 6 })),
     { cancel: true }
   );
-
-  // Overkill, including the book's worked examples
 
   check(
     "Lady Ulnock: D=19, hpMax=6 -> 3 additional minions",
@@ -124,8 +112,6 @@ export function runEngineSelfTests() {
     { proposed: [], shortfall: 3 }
   );
 
-  // Overkill range
-
   check(
     "Lady Ulnock: reach 5, three goblins within 5, one at 10 -> only the three nearby",
     () => filterMeleeCandidates(
@@ -160,6 +146,60 @@ export function runEngineSelfTests() {
       { id: "z1", distance: 20 },
       { id: "z2", distance: 79 }
     ]
+  );
+
+  check(
+    "10 damage on 6 HP -> 1 more minion, selection limit is 1",
+    () => computeOverkill(10, 6).additionalCount,
+    1
+  );
+
+  check(
+    "limit 1, one checked, a second is checked -> the older one is dropped",
+    () => applySelectionChange(["a"], "b", true, 1),
+    { order: ["b"], dropped: ["a"] }
+  );
+
+  check(
+    "limit 2, a and b checked, c is checked -> a is dropped, order b, c",
+    () => applySelectionChange(["a", "b"], "c", true, 2),
+    { order: ["b", "c"], dropped: ["a"] }
+  );
+
+  check(
+    "limit 2, one checked, a second is checked -> nothing dropped",
+    () => applySelectionChange(["a"], "b", true, 2),
+    { order: ["a", "b"], dropped: [] }
+  );
+
+  check(
+    "unchecking a box removes it from the order",
+    () => applySelectionChange(["a", "b"], "a", false, 2),
+    { order: ["b"], dropped: [] }
+  );
+
+  check(
+    "GM clamp: 4 selected, limit 1 -> only the nearest candidate is accepted",
+    () => clampSelection(["d", "c", "b", "a"], ["a", "b", "c", "d"], 1),
+    { accepted: ["a"], excess: ["b", "c", "d"], unknown: [] }
+  );
+
+  check(
+    "GM clamp: unknown and duplicate ids are ignored",
+    () => clampSelection(["a", "a", "zz"], ["a", "b"], 2),
+    { accepted: ["a"], excess: [], unknown: ["zz"] }
+  );
+
+  check(
+    "GM clamp: selection within the limit is untouched",
+    () => clampSelection(["b"], ["a", "b", "c"], 2),
+    { accepted: ["b"], excess: [], unknown: [] }
+  );
+
+  check(
+    "no limit (Infinity) never drops a selection",
+    () => applySelectionChange(["a", "b", "c"], "d", true, Infinity),
+    { order: ["a", "b", "c", "d"], dropped: [] }
   );
 
   const passed = cases.filter(c => c.pass).length;
