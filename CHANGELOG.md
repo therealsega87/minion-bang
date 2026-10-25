@@ -1,5 +1,35 @@
 # Changelog
 
+## 1.5.0
+
+The versions 1.3.x were test builds that were never published, and 1.4 was skipped: this release follows 1.2.0 and gathers everything.
+
+### Added: shared turns and bands
+
+- World setting **Shared turns and bands** (off by default). It uses Foundry's native combatant groups, so it is not compatible with Squad Combat Initiative: if that module is active the GM gets a warning and the groups stay off.
+- **Automatic groups.** Minions of the same stat block added to a combat before initiative is rolled are grouped in blocks of the size given by the Minion Encounter Building table (5, 8 or 10 by challenge rating). A lone minion makes no group, minions without a challenge rating and creatures that are not minions are never grouped, groups made by hand are left alone, and after initiative is rolled nothing is grouped.
+- **Maximum band size table**, editable from the settings (GM only), with a button to restore the rules. A band has from 2 creatures up to the maximum of its challenge rating. Changing the table affects game balance and the editor says so.
+- **Initiative of the groups** (world setting): the captain's roll (default), or, with every member rolling, the average, the highest, the lowest or the median (averages round up). In the modes where every member rolls, the module rolls for the members that have not rolled yet and posts a summary card to the GMs.
+- **Shared turns.** A band takes one step in the tracker: the turn stops on its first member, and when the GM passes the turn the module walks through the other members one by one, each with its own start and end of turn. "Previous turn" goes back to the first member of the band. The order is rebuilt on every client after a change to the groups.
+- **"Groups and bands" window**, opened by a button in the combat tracker header (GM only):
+  - one tab per minion type found among the tokens of the scene that are not in the combat yet (with selected tokens you are asked whether to use only those);
+  - the proposal follows the maximum of the table, you can move creatures between bands or leave them alone, and rename the bands; the window checks everything while you work;
+  - every band has a color (colors already used in the combat are skipped), a captain (the first member by default) and an initiative mode (as in the settings, or its own);
+  - the color shows as a ring on the tokens of the GM's map while choosing; hovering a row highlights that token;
+  - **Apply** creates the combat if there is none, or adds the new groups and creatures to the existing one, without rolling initiative and without touching what is already there. With more than one type it asks for a confirmation. It checks that every token still exists and is not in the combat, and says so if something changes while the window is open;
+  - the tab **Existing bands** lists the bands already in the combat: the color can always be changed, the mode and the captain only until the band has rolled initiative (a lock marks the bands that have). A band without a captain shows "No captain" until you choose one.
+- **Band color on the map**, for everyone, once the creatures are in the combat: with the Dynamic Token Ring enabled the ring color is set to the band color (the original is saved and restored when the creature leaves the band or the combat ends), otherwise a circle is drawn around the token. Creatures alone are not touched.
+- **Captain.** In the captain's roll mode the group takes the captain's initiative, and only the captain rolls: when Foundry asks to roll for another member, the module rolls the captain instead, and the value is then locked. If the captain is defeated or leaves the combat, the first member standing becomes the captain and the group's value does not change.
+- **Reset Initiative** now also clears the groups and releases the captain's locked roll.
+- In the modes Average, Highest, Lowest and Median, when a member dies the group keeps its value.
+- The diagnostics report lists the new settings, Squad Combat Initiative and the status of the groups.
+
+### Added: other
+
+- Overkill: if one of the extra minions cannot be downed, the others still fall, the chat still reports them and the GM is told which one failed.
+- **Combat Stats and Deep Combat Stats** (modes "MidiQOL auto" and "MidiQOL manual"): the extra minions downed by an overkill are counted as kills, and as damage dealt, for the character who triggered the overkill. Nothing changes without these modules or in their native mode.
+- Italian and English texts for everything above.
+
 ## 1.2.0
 
 ### Added

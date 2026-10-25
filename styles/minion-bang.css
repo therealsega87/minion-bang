@@ -1,0 +1,354 @@
+.minion-bang-overkill-dialog {
+  max-width: 380px;
+  max-height: 620px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.minion-bang-overkill-dialog .minion-bang-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  margin-bottom: 0.5em;
+}
+
+.minion-bang-overkill-dialog .minion-bang-portrait {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-dark-tertiary, #444);
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list {
+  list-style: none;
+  margin: 0.5em 0;
+  padding: 0;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list li {
+  padding: 0.2em 0;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidate-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+}
+
+.minion-bang-overkill-dialog .minion-bang-thumb {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-name {
+  flex: 1 1 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-distance {
+  color: var(--color-text-dark-secondary, #888);
+  font-size: 0.9em;
+  flex: 0 0 auto;
+}
+
+.minion-bang-overkill-dialog .minion-bang-shortfall {
+  color: var(--color-level-warning, #b8860b);
+  font-style: italic;
+}
+
+.minion-bang-overkill-dialog .minion-bang-empty {
+  color: var(--color-text-dark-secondary, #888);
+  font-style: italic;
+}
+
+.minion-bang-toggle.active i {
+  color: #ff3b30;
+}
+
+.minion-bang-overkill-dialog .minion-bang-opportunity {
+  display: flex;
+  gap: 1em;
+  margin: 0.25em 0 0.5em;
+}
+
+.minion-bang-overkill-dialog .minion-bang-limit {
+  margin: 0.5em 0 0;
+  font-weight: bold;
+}
+
+.minion-bang-overkill-dialog .minion-bang-candidates.minion-bang-locked {
+  opacity: 0.4;
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.minion-bang-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.minion-bang-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+.minion-bang-card-portrait {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-dark-tertiary, #444);
+  flex: 0 0 auto;
+}
+
+.minion-bang-card-title h3 {
+  margin: 0;
+  border: none;
+  font-size: var(--font-size-16, 1rem);
+}
+
+.minion-bang-card-mode {
+  font-size: var(--font-size-12, 0.75rem);
+  opacity: 0.75;
+}
+
+.minion-bang-card-rolls {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--color-border-light-tertiary, #bbb);
+  border-radius: 3px;
+}
+
+.minion-bang-card-rolls li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.15em 0.5em;
+}
+
+.minion-bang-card-rolls li + li {
+  border-top: 1px solid var(--color-border-light-tertiary, #bbb);
+}
+
+.minion-bang-card-roll {
+  font-weight: bold;
+}
+
+.minion-bang-card-expression {
+  font-size: var(--font-size-12, 0.75rem);
+  text-align: center;
+  opacity: 0.85;
+}
+
+.minion-bang-card-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.2em 0.6em;
+  border: 1px solid var(--color-border-light-tertiary, #bbb);
+  border-radius: 3px;
+}
+
+.minion-bang-card-total-value {
+  font-size: var(--font-size-24, 1.5rem);
+  font-weight: bold;
+}
+
+.minion-bang-maximums-warning {
+  font-weight: bold;
+  color: var(--color-level-warning, #e0a030);
+}
+
+.minion-bang-maximums-head {
+  font-weight: bold;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+  border-bottom: 1px solid var(--color-light-5, #888);
+}
+
+.minion-bang-maximums-scroll {
+  max-height: calc(100vh - 360px);
+  min-height: 160px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.minion-bang-maximums-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  padding: 2px 6px;
+  text-align: center;
+}
+
+.minion-bang-maximums-scroll .minion-bang-maximums-row:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.minion-bang-maximums-row input[type="number"] {
+  width: 4em;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.minion-bang-bands-button {
+  width: auto;
+  margin: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.minion-bang-bands-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.minion-bang-bands-tabs button {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.minion-bang-bands-tabs button.active {
+  font-weight: bold;
+  outline: 1px solid var(--color-light-5, #888);
+}
+
+.minion-bang-bands-color {
+  width: 2.2rem;
+  height: 1.8rem;
+  padding: 0;
+  cursor: pointer;
+}
+
+.minion-bang-bands-window.application {
+  max-height: calc(100vh - 40px);
+}
+
+.minion-bang-bands-window .window-content {
+  overflow: hidden;
+}
+
+.minion-bang-bands {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.minion-bang-bands-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.minion-bang-bands-list {
+  flex: 0 1 auto;
+  max-height: 30vh;
+  min-height: 3.5rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.minion-bang-bands-list-existing {
+  flex: 1 1 auto;
+  max-height: none;
+}
+
+.minion-bang-bands-existing-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.minion-bang-bands-header,
+.minion-bang-bands-plan,
+.minion-bang-bands-status,
+.minion-bang-bands-global {
+  margin: 0.2rem 0;
+}
+
+.minion-bang-bands-footer,
+.minion-bang-bands-tabs,
+.minion-bang-bands-list-head,
+.minion-bang-bands-head,
+.minion-bang-bands-status,
+.minion-bang-bands-global {
+  flex: 0 0 auto;
+}
+
+.minion-bang-bands-panel[hidden] {
+  display: none !important;
+}
+
+.minion-bang-bands-band {
+  display: grid;
+  grid-template-columns: 4.5rem 2.5rem repeat(3, minmax(0, 1fr)) 3.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.15rem 0;
+}
+
+.minion-bang-bands-band input[type="text"],
+.minion-bang-bands-band select {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.minion-bang-bands-list-head {
+  font-weight: bold;
+  scrollbar-gutter: stable;
+  overflow: hidden;
+}
+
+.minion-bang-bands-columns {
+  display: grid;
+  grid-template-columns: 2fr repeat(var(--minion-bang-columns), 1fr);
+  align-items: center;
+}
+
+.minion-bang-bands-head {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  text-align: center;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+  border-bottom: 1px solid var(--color-light-5, #888);
+}
+
+.minion-bang-bands-body {
+  flex: 1 1 auto;
+  min-height: 5rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.minion-bang-bands-cell {
+  text-align: center;
+}
+
+.minion-bang-bands-member img {
+  vertical-align: middle;
+  border: none;
+}
+
+.minion-bang-bands-footer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.minion-bang-bad {
+  color: var(--color-level-error, #d04040);
+}

@@ -1,0 +1,172 @@
+{
+  "MINIONBANG": {
+    "Unknown": "Unknown",
+    "Settings": {
+      "Debug": {
+        "Name": "Enable Debug",
+        "Hint": "Prints detailed step-by-step logs to the browser console for every minion damage event. Leave this off for normal play."
+      },
+      "AutoSelect": {
+        "Name": "Preselect the proposed minions",
+        "Hint": "When on, the overkill dialog opens with the nearest minions already checked. When off, nothing is checked and the player picks the minions."
+      },
+      "Diagnostics": {
+        "Name": "Run Diagnostics",
+        "Label": "Run Diagnostics",
+        "Hint": "Runs a self-test of the module's rules engine and lets you download a report to share when asking for help."
+      },
+      "Groups": {
+        "Name": "Shared turns and bands",
+        "Hint": "Groups the minions of the same stat block under one initiative and lets the GM split them into bands. Not compatible with Squad Combat Initiative: turn that module off first."
+      },
+      "GroupMode": {
+        "Name": "Initiative of the groups",
+        "Hint": "How the initiative of a group is decided. With \"One roll per group\" a single roll counts for the whole group: the captain's, in the bands that have one. With the other modes every member rolls and the group takes the average, the highest, the lowest or the median of the rolls (averages round up). Applies only when \"Shared turns and bands\" is on. Each band made with the \"Groups and bands\" window can have its own mode and captain."
+      },
+      "Maximums": {
+        "Name": "Maximum band size",
+        "Label": "Edit the table",
+        "Hint": "The maximum number of creatures in a band for each challenge rating. The default is the table of the rules. Changing it affects game balance. Applies to the whole world."
+      }
+    },
+    "Flag": {
+      "Name": "Minion",
+      "Hint": "This actor is treated as a Minion by the Minion! module: reduced to 0 HP by the Minion trait, eligible for overkill.",
+      "Section": "Minion!"
+    },
+    "Hud": {
+      "Toggle": "Toggle Minion"
+    },
+    "Overkill": {
+      "Title": "Minion! - Overkill",
+      "Intro": "<strong>{attacker}</strong> hits <strong>{target}</strong> with <strong>{weapon}</strong> and deals enough damage to involve other minions.",
+      "OpportunityQuestion": "Was this an opportunity attack?",
+      "OpportunityNo": "No",
+      "OpportunityYes": "Yes (no overkill)",
+      "NoCandidates": "No other minion in range: overkill only affects the target already hit.",
+      "Limit": "You can select at most {max} minion(s). Selected: {selected}.",
+      "Locked": "Opportunity attacks cause no overkill. Press Confirm to close.",
+      "Shortfall": "The excess damage would be enough for {count} more minion(s), but there are no others in range.",
+      "Confirm": "Confirm",
+      "Cancel": "Cancel"
+    },
+    "Waiting": {
+      "Text": "Waiting for <strong>{player}</strong> to resolve <strong>{attacker}</strong>'s overkill.",
+      "APlayer": "a player",
+      "Decide": "Decide for them",
+      "Cancel": "Cancel overkill"
+    },
+    "Chat": {
+      "OneMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, one more enemy falls.",
+      "ManyMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, {count} more enemies fall.",
+      "NoOverkill": "<strong>{attacker}</strong> decided not to overkill.",
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> pressed Confirm but chose no minion: no overkill."
+    },
+    "Notify": {
+      "SceneNotViewed": "Minion! overkill skipped: the GM is not viewing the scene where the attack happened.",
+      "OverkillFailed": "Minion!: the overkill could not down {names}. See the console for details.",
+      "NoOverkill": "{attacker} decided not to overkill.",
+      "NoOverkillConfirmed": "{attacker} pressed Confirm but chose no minion: no overkill."
+    },
+    "Diagnostics": {
+      "Title": "Minion! - Diagnostics",
+      "Passed": "Engine self-test: <strong>{passed}/{total}</strong> passed.",
+      "Failed": "Engine self-test: <strong>{passed}/{total}</strong> passed, <strong>{failed} failed</strong>. Please attach the full report when asking for help.",
+      "SaveHint": "Click \"Save Report\" to download the full diagnostics file.",
+      "Save": "Save Report",
+      "Close": "Close"
+    },
+    "Groups": {
+      "BlockedBySci": "Minion!: “Shared turns and bands” is on, but Squad Combat Initiative is active and manages the same groups. Turn Squad Combat Initiative off in the module list. While it stays active, the Minion! groups remain off."
+    },
+    "GroupMode": {
+      "captain": "One roll per group (the captain's)",
+      "average": "Average of all the members",
+      "highest": "Highest roll",
+      "lowest": "Lowest roll",
+      "median": "Median of all the members"
+    },
+    "GroupCard": {
+      "Title": "{group} rolls for Initiative!",
+      "Result": "Initiative"
+    },
+    "BandTurns": {
+      "Failed": "Minion!: the turn could not move through every member of the band. See the console for details."
+    },
+    "GroupInitiative": {
+      "Incomplete": "Minion!: not every member of {group} has rolled initiative, so the group value was not calculated.",
+      "Failed": "Minion!: could not complete the initiative of {group}. See the console for details."
+    },
+    "Maximums": {
+      "Title": "Maximum band size",
+      "Intro": "Maximum creatures per band for each challenge rating. A creature above CR 21 uses the last row.",
+      "Warning": "Changing these values from the table of the rules affects game balance.",
+      "Cr": "CR",
+      "Max": "Maximum",
+      "Default": "Default",
+      "Save": "Save",
+      "Reset": "Restore default",
+      "Cancel": "Cancel",
+      "Saved": "Maximum table saved.",
+      "ResetDone": "Maximum table restored to the default.",
+      "Invalid": "Every maximum must be a whole number of at least 2. The table was not saved.",
+      "Corrupt": "Minion!: the stored maximum table is not valid, so the default table is being used. Open the table from the settings to fix it."
+    },
+    "Bands": {
+      "Button": "Groups and bands",
+      "Title": "Groups and bands",
+      "GroupsOff": "Groups and bands needs \"Shared turns and bands\" to be on in the module settings.",
+      "NoCandidates": "No minion available: the ones already in the combat and the ones without a challenge rating are not shown.",
+      "OpenFailed": "Minion!: the groups and bands window could not be opened. See the console for details.",
+      "Question": {
+        "Title": "Selected tokens",
+        "Content": "Do you want to use only the selected monsters?",
+        "Yes": "Yes, only the selected ones",
+        "No": "No, all the ones in the scene"
+      },
+      "Header": "{count} minions · CR {cr} · maximum {maximum} per band",
+      "Plan": "Bands: {sizes}.",
+      "PlanSingles": "{count} alone.",
+      "PlanNone": "A single minion does not make a band: it will be added alone.",
+      "Band": "Band {number}",
+      "Member": "Minion",
+      "Single": "Alone",
+      "Ok": "All in order.",
+      "Error": {
+        "Count": "Band {band}: it needs {expected} members, it has {actual}.",
+        "Name": "Band {band}: the name cannot be empty."
+      },
+      "FixErrors": "Fix the errors to be able to apply.",
+      "Apply": "Apply",
+      "Close": "Close",
+      "Color": "Color",
+      "Stale": "Some creatures are no longer available: {names}. Close the window and open it again.",
+      "Applied": "Bands applied: {groups} groups and {singles} creatures alone added to the combat.",
+      "ApplyFailed": "Minion!: the bands could not be applied completely ({groups} groups and {combatants} combatants had already been created). See the console for details.",
+      "Confirm": {
+        "Title": "Apply the bands",
+        "Content": "You are about to add {count} types of monsters to the combat. Have you checked all the bands?",
+        "Line": "{name}: {bands} bands, {singles} alone ({total} creatures)",
+        "Yes": "Yes, apply",
+        "No": "No, go back"
+      },
+      "Captain": "Captain",
+      "Mode": "Initiative",
+      "ModeDefault": "Settings: {mode}",
+      "BandName": "Name",
+      "ModeShort": {
+        "captain": "Captain's roll",
+        "average": "Average",
+        "highest": "Highest",
+        "lowest": "Lowest",
+        "median": "Median"
+      },
+      "NoCaptain": "No captain",
+      "ExistingTab": "Existing bands",
+      "ExistingHeader": "Bands already in the combat. The color can always be changed. The initiative mode and the captain can only be changed before the band rolls initiative.",
+      "ExistingLocked": "This band has already rolled initiative: the mode and the captain can no longer be changed.",
+      "ExistingApplied": "Bands updated: {count}.",
+      "ExistingFailed": "Minion!: the existing bands could not be updated. See the console for details."
+    }
+  }
+}

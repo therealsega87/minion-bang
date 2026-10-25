@@ -1,0 +1,172 @@
+{
+  "MINIONBANG": {
+    "Unknown": "Sconosciuto",
+    "Settings": {
+      "Debug": {
+        "Name": "Attiva Debug",
+        "Hint": "Scrive nella console del browser log dettagliati, passo per passo, per ogni danno subito da un minion. Lascialo spento durante il gioco normale."
+      },
+      "AutoSelect": {
+        "Name": "Preseleziona i minion proposti",
+        "Hint": "Se attiva, la finestra dell'overkill si apre con i minion più vicini già spuntati. Se spenta, nessun minion è spuntato e il giocatore sceglie quali colpire."
+      },
+      "Diagnostics": {
+        "Name": "Esegui Diagnostica",
+        "Label": "Esegui Diagnostica",
+        "Hint": "Esegue un autotest del motore delle regole del modulo e permette di scaricare un report da condividere quando si chiede aiuto."
+      },
+      "Groups": {
+        "Name": "Turni condivisi e bande",
+        "Hint": "Raggruppa i minion dello stesso stat block sotto un'unica iniziativa e permette al GM di dividerli in bande. Non è compatibile con Squad Combat Initiative: disattiva prima quel modulo."
+      },
+      "GroupMode": {
+        "Name": "Iniziativa dei gruppi",
+        "Hint": "Come si decide l'iniziativa di un gruppo. Con \"Un tiro per gruppo\" un solo tiro vale per tutto il gruppo: quello del capitano, nelle bande che ne hanno uno. Con le altre modalità tira ogni membro e il gruppo prende la media, il tiro più alto, il più basso o la mediana dei tiri (le medie si arrotondano per eccesso). Vale solo se \"Turni condivisi e bande\" è attivo. Ogni banda creata con la finestra \"Gruppi e bande\" può avere una propria modalità e un proprio capitano."
+      },
+      "Maximums": {
+        "Name": "Dimensione massima delle bande",
+        "Label": "Modifica la tabella",
+        "Hint": "Il numero massimo di creature di una banda per ogni grado di sfida. Il valore predefinito è la tabella delle regole. Modificarlo influisce sul bilanciamento del gioco. Vale per tutto il mondo."
+      }
+    },
+    "Flag": {
+      "Name": "Minion",
+      "Hint": "Questo attore è trattato come Minion dal modulo Minion!: ridotto a 0 PF dal tratto Minion, idoneo all'overkill.",
+      "Section": "Minion!"
+    },
+    "Hud": {
+      "Toggle": "Attiva/disattiva Minion"
+    },
+    "Overkill": {
+      "Title": "Minion! - Overkill",
+      "Intro": "<strong>{attacker}</strong> colpisce <strong>{target}</strong> con <strong>{weapon}</strong> e infligge danni sufficienti a coinvolgere altri minion.",
+      "OpportunityQuestion": "Era un attacco di opportunità?",
+      "OpportunityNo": "No",
+      "OpportunityYes": "Sì (nessun overkill)",
+      "NoCandidates": "Nessun altro minion a portata: l'overkill riguarda solo il bersaglio già colpito.",
+      "Limit": "Puoi selezionare al massimo {max} minion. Selezionati: {selected}.",
+      "Locked": "Gli attacchi di opportunità non causano overkill. Premi Conferma per chiudere.",
+      "Shortfall": "I danni in eccesso basterebbero per altri {count} minion, ma non ce ne sono altri a portata.",
+      "Confirm": "Conferma",
+      "Cancel": "Annulla"
+    },
+    "Waiting": {
+      "Text": "In attesa che <strong>{player}</strong> risolva l'overkill di <strong>{attacker}</strong>.",
+      "APlayer": "un giocatore",
+      "Decide": "Decidi al suo posto",
+      "Cancel": "Annulla overkill"
+    },
+    "Chat": {
+      "OneMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cade un altro nemico.",
+      "ManyMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cadono altri {count} nemici.",
+      "NoOverkill": "<strong>{attacker}</strong> ha deciso di non fare un overkill.",
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> ha premuto Conferma ma non ha scelto nessun minion: nessun overkill."
+    },
+    "Notify": {
+      "SceneNotViewed": "Overkill di Minion! saltato: il GM non sta guardando la scena in cui è avvenuto l'attacco.",
+      "OverkillFailed": "Minion!: l'overkill non è riuscito ad abbattere {names}. Dettagli nella console.",
+      "NoOverkill": "{attacker} ha deciso di non fare un overkill.",
+      "NoOverkillConfirmed": "{attacker} ha premuto Conferma ma non ha scelto nessun minion: nessun overkill."
+    },
+    "Diagnostics": {
+      "Title": "Minion! - Diagnostica",
+      "Passed": "Autotest del motore: <strong>{passed}/{total}</strong> superati.",
+      "Failed": "Autotest del motore: <strong>{passed}/{total}</strong> superati, <strong>{failed} falliti</strong>. Allega il report completo quando chiedi aiuto.",
+      "SaveHint": "Clicca \"Salva report\" per scaricare il file di diagnostica completo.",
+      "Save": "Salva report",
+      "Close": "Chiudi"
+    },
+    "Groups": {
+      "BlockedBySci": "Minion!: «Turni condivisi e bande» è attivo, ma Squad Combat Initiative è attivo e gestisce gli stessi gruppi. Disattiva Squad Combat Initiative dall'elenco dei moduli. Finché resta attivo, i gruppi di Minion! restano spenti."
+    },
+    "GroupMode": {
+      "captain": "Un tiro per gruppo (quello del capitano)",
+      "average": "Media di tutti i membri",
+      "highest": "Tiro più alto",
+      "lowest": "Tiro più basso",
+      "median": "Mediana di tutti i membri"
+    },
+    "GroupCard": {
+      "Title": "{group} tira l'Iniziativa!",
+      "Result": "Iniziativa"
+    },
+    "BandTurns": {
+      "Failed": "Minion!: non è stato possibile far scorrere il turno su tutti i membri della banda. Dettagli nella console."
+    },
+    "GroupInitiative": {
+      "Incomplete": "Minion!: non tutti i membri di {group} hanno tirato l'iniziativa, quindi il valore del gruppo non è stato calcolato.",
+      "Failed": "Minion!: non è stato possibile completare l'iniziativa di {group}. Dettagli nella console."
+    },
+    "Maximums": {
+      "Title": "Dimensione massima delle bande",
+      "Intro": "Numero massimo di creature per banda per ogni grado di sfida. Una creatura sopra il GS 21 usa l'ultima riga.",
+      "Warning": "Modificare questi valori rispetto alla tabella delle regole influisce sul bilanciamento del gioco.",
+      "Cr": "GS",
+      "Max": "Massimo",
+      "Default": "Predefinito",
+      "Save": "Salva",
+      "Reset": "Ripristina predefinito",
+      "Cancel": "Annulla",
+      "Saved": "Tabella dei massimi salvata.",
+      "ResetDone": "Tabella dei massimi ripristinata al valore predefinito.",
+      "Invalid": "Ogni massimo deve essere un numero intero di almeno 2. La tabella non è stata salvata.",
+      "Corrupt": "Minion!: la tabella dei massimi salvata non è valida, quindi viene usata quella predefinita. Aprila dalle impostazioni per correggerla."
+    },
+    "Bands": {
+      "Button": "Gruppi e bande",
+      "Title": "Gruppi e bande",
+      "GroupsOff": "«Gruppi e bande» richiede che «Turni condivisi e bande» sia attivo nelle impostazioni del modulo.",
+      "NoCandidates": "Nessun minion disponibile: quelli già nel combattimento e quelli senza grado di sfida non vengono mostrati.",
+      "OpenFailed": "Minion!: non è stato possibile aprire la finestra dei gruppi e delle bande. Dettagli nella console.",
+      "Question": {
+        "Title": "Token selezionati",
+        "Content": "Vuoi usare solo i mostri selezionati?",
+        "Yes": "Sì, solo i selezionati",
+        "No": "No, tutti quelli in scena"
+      },
+      "Header": "{count} minion · GS {cr} · massimo {maximum} per banda",
+      "Plan": "Bande: {sizes}.",
+      "PlanSingles": "Da soli: {count}.",
+      "PlanNone": "Un solo minion non forma una banda: verrà aggiunto da solo.",
+      "Band": "Banda {number}",
+      "Member": "Minion",
+      "Single": "Da solo",
+      "Ok": "Tutto in ordine.",
+      "Error": {
+        "Count": "Banda {band}: servono {expected} componenti, ce ne sono {actual}.",
+        "Name": "Banda {band}: il nome non può essere vuoto."
+      },
+      "FixErrors": "Correggi gli errori per poter applicare.",
+      "Apply": "Applica",
+      "Close": "Chiudi",
+      "Color": "Colore",
+      "Stale": "Alcune creature non sono più disponibili: {names}. Chiudi la finestra e riaprila.",
+      "Applied": "Bande applicate: {groups} gruppi e {singles} creature da sole aggiunti al combattimento.",
+      "ApplyFailed": "Minion!: non è stato possibile applicare tutte le bande ({groups} gruppi e {combatants} combattenti erano già stati creati). Vedi la console per i dettagli.",
+      "Confirm": {
+        "Title": "Applica le bande",
+        "Content": "Stai per aggiungere al combattimento {count} tipi di mostri. Hai controllato tutte le bande?",
+        "Line": "{name}: {bands} bande, {singles} da soli ({total} creature)",
+        "Yes": "Sì, applica",
+        "No": "No, torna indietro"
+      },
+      "Captain": "Capitano",
+      "Mode": "Iniziativa",
+      "ModeDefault": "Impostazione: {mode}",
+      "BandName": "Nome",
+      "ModeShort": {
+        "captain": "Tiro del capitano",
+        "average": "Media",
+        "highest": "Più alto",
+        "lowest": "Più basso",
+        "median": "Mediana"
+      },
+      "NoCaptain": "Nessun capitano",
+      "ExistingTab": "Bande esistenti",
+      "ExistingHeader": "Bande già presenti nel combattimento. Il colore si può sempre cambiare. La modalità di iniziativa e il capitano si possono cambiare solo prima che la banda tiri l'iniziativa.",
+      "ExistingLocked": "Questa banda ha già tirato l'iniziativa: modalità e capitano non si possono più cambiare.",
+      "ExistingApplied": "Bande aggiornate: {count}.",
+      "ExistingFailed": "Minion!: le bande esistenti non si sono potute aggiornare. Controlla la console per i dettagli."
+    }
+  }
+}

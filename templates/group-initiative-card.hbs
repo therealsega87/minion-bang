@@ -1,0 +1,19 @@
+<div class="minion-bang-card">
+  <header class="minion-bang-card-header">
+    {{#if members.0.img}}<img class="minion-bang-card-portrait" src="{{members.0.img}}" alt="">{{/if}}
+    <div class="minion-bang-card-title">
+      <h3>{{title}}</h3>
+      <span class="minion-bang-card-mode">{{modeLabel}}</span>
+    </div>
+  </header>
+  <ul class="minion-bang-card-rolls">
+    {{#each members}}
+    <li><span class="minion-bang-card-name">{{name}}</span><span class="minion-bang-card-roll">{{initiative}}</span></li>
+    {{/each}}
+  </ul>
+  <div class="minion-bang-card-expression">{{expression}}</div>
+  <div class="minion-bang-card-total">
+    <span class="minion-bang-card-total-label">{{resultLabel}}</span>
+    <span class="minion-bang-card-total-value">{{result}}</span>
+  </div>
+</div>

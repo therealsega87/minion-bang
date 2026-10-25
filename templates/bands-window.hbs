@@ -1,0 +1,88 @@
+<div class="minion-bang-bands">
+  <nav class="minion-bang-bands-tabs">
+    {{#each types}}
+    <button type="button" data-tab="{{index}}" class="{{#if active}}active{{/if}}">{{name}}</button>
+    {{/each}}
+    {{#if existing}}
+    <button type="button" data-tab="{{existing.index}}" class="{{#if existing.active}}active{{/if}}">{{labels.existingTab}}</button>
+    {{/if}}
+  </nav>
+  {{#each types}}
+  <section class="minion-bang-bands-panel" data-panel="{{index}}" {{#unless active}}hidden{{/unless}}>
+    <p class="minion-bang-bands-header">{{header}}</p>
+    <p class="minion-bang-bands-plan">{{plan}}</p>
+    <div class="minion-bang-bands-band minion-bang-bands-list-head">
+      <span></span>
+      <span></span>
+      <span>{{../labels.bandName}}</span>
+      <span>{{../labels.mode}}</span>
+      <span>{{../labels.captain}}</span>
+      <span></span>
+    </div>
+    <div class="minion-bang-bands-list">
+    {{#each bands}}
+    <div class="minion-bang-bands-band">
+      <span>{{label}}</span>
+      <input type="color" class="minion-bang-bands-color" title="{{../../labels.color}}" data-band-color data-type="{{typeIndex}}" data-band="{{index}}" value="{{color}}">
+      <input type="text" data-band-name data-type="{{typeIndex}}" data-band="{{index}}" value="{{name}}">
+      <select title="{{../../labels.mode}}" data-band-mode data-type="{{typeIndex}}" data-band="{{index}}">
+        {{#each modeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+      <select title="{{../../labels.captain}}" data-band-captain data-type="{{typeIndex}}" data-band="{{index}}" {{#if captainDisabled}}disabled{{/if}}>
+        {{#each captainOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+      <span data-count data-type="{{typeIndex}}" data-band="{{index}}">{{actual}} / {{expected}}</span>
+    </div>
+    {{/each}}
+    </div>
+    <div class="minion-bang-bands-head minion-bang-bands-columns" style="--minion-bang-columns: {{columns}}">
+      <span>{{../labels.member}}</span>
+      {{#each bands}}<span>{{label}}</span>{{/each}}
+      <span>{{../labels.single}}</span>
+    </div>
+    <div class="minion-bang-bands-body minion-bang-bands-columns" style="--minion-bang-columns: {{columns}}">
+      {{#each rows}}
+      <span class="minion-bang-bands-member" data-member-row data-type="{{../index}}" data-member="{{id}}"><img src="{{img}}" alt="" width="24" height="24"> {{name}}</span>
+      {{#each cells}}
+      <span class="minion-bang-bands-cell"><input type="radio" name="{{radio}}" value="{{value}}" data-assign data-type="{{typeIndex}}" data-member="{{memberId}}" {{#if checked}}checked{{/if}}></span>
+      {{/each}}
+      {{/each}}
+    </div>
+    <p class="minion-bang-bands-status" data-status="{{index}}"></p>
+  </section>
+  {{/each}}
+  {{#if existing}}
+  <section class="minion-bang-bands-panel" data-panel="{{existing.index}}" {{#unless existing.active}}hidden{{/unless}}>
+    <p class="minion-bang-bands-header">{{existing.header}}</p>
+    <div class="minion-bang-bands-band minion-bang-bands-list-head">
+      <span></span>
+      <span></span>
+      <span>{{labels.bandName}}</span>
+      <span>{{labels.mode}}</span>
+      <span>{{labels.captain}}</span>
+      <span></span>
+    </div>
+    <div class="minion-bang-bands-list minion-bang-bands-list-existing">
+    {{#each existing.groups}}
+    <div class="minion-bang-bands-band" data-existing-row="{{id}}">
+      <span><i class="fa-solid fa-lock" title="{{@root.existing.lockedTitle}}" data-existing-lock data-group="{{id}}" {{#unless rolled}}hidden{{/unless}}></i></span>
+      <input type="color" class="minion-bang-bands-color" title="{{@root.labels.color}}" data-existing-color data-group="{{id}}" value="{{color}}">
+      <span class="minion-bang-bands-existing-name" title="{{name}}">{{name}}</span>
+      <select title="{{@root.labels.mode}}" data-existing-mode data-group="{{id}}" {{#if rolled}}disabled{{/if}}>
+        {{#each modeOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+      <select title="{{@root.labels.captain}}" data-existing-captain data-group="{{id}}" {{#if captainDisabled}}disabled{{/if}}>
+        {{#each captainOptions}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+      </select>
+      <span>{{count}}</span>
+    </div>
+    {{/each}}
+    </div>
+  </section>
+  {{/if}}
+  <p class="minion-bang-bands-global" data-global-status></p>
+  <footer class="minion-bang-bands-footer">
+    <button type="button" data-action="apply" data-apply><i class="fa-solid fa-check"></i> {{labels.apply}}</button>
+    <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> {{labels.close}}</button>
+  </footer>
+</div>

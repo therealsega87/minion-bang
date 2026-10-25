@@ -1,0 +1,16 @@
+<div class="minion-bang-maximums">
+  <p>{{intro}}</p>
+  <p class="minion-bang-maximums-warning">{{warning}}</p>
+  <div class="minion-bang-maximums-row minion-bang-maximums-head">
+    <span>{{crLabel}}</span><span>{{maxLabel}}</span><span>{{defaultLabel}}</span>
+  </div>
+  <div class="minion-bang-maximums-scroll">
+    {{#each rows}}
+    <div class="minion-bang-maximums-row">
+      <span>{{cr}}</span>
+      <span><input type="number" data-maximum="{{index}}" min="2" step="1" value="{{value}}"></span>
+      <span>{{defaultValue}}</span>
+    </div>
+    {{/each}}
+  </div>
+</div>
