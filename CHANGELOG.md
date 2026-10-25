@@ -27,7 +27,7 @@ The versions 1.3.x were test builds that were never published, and 1.4 was skipp
 ### Added: other
 
 - Overkill: if one of the extra minions cannot be downed, the others still fall, the chat still reports them and the GM is told which one failed.
-- **Combat Stats and Deep Combat Stats** (modes "MidiQOL auto" and "MidiQOL manual"): the extra minions downed by an overkill are counted as kills, and as damage dealt, for the character who triggered the overkill. Nothing changes without these modules or in their native mode.
+- **Combat Stats** (modes "MidiQOL auto" and "MidiQOL manual"): the extra minions downed by an overkill are counted as kills, and as damage dealt, for the character who triggered the overkill. Nothing changes without Combat Stats or in its native mode.
 - Italian and English texts for everything above.
 
 ## 1.2.0
