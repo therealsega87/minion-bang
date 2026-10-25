@@ -1,0 +1,121 @@
+name: Test and release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - name: Engine self-test
+        run: node tests/engine.test.mjs
+      - name: Group initiative calculation
+        run: node tests/group-initiative.test.mjs
+      - name: Band maximums table
+        run: node tests/band-maximums.test.mjs
+      - name: Band split
+        run: node tests/band-split.test.mjs
+      - name: Band colours
+        run: node tests/band-colors.test.mjs
+      - name: Band captain
+        run: node tests/band-captain.test.mjs
+      - name: Existing bands
+        run: node tests/existing-bands.test.mjs
+      - name: Existing bands in the combat
+        run: node tests/existing-bands-adapter.test.mjs
+      - name: Kill credit for Combat Stats
+        run: node tests/kill-credit.test.mjs
+      - name: Kill credit in the combat
+        run: node tests/combat-stats-credit.test.mjs
+      - name: Band apply plan
+        run: node tests/band-apply.test.mjs
+      - name: Token colour plan
+        run: node tests/token-color-plan.test.mjs
+      - name: Band markers on the map
+        run: node tests/band-markers.test.mjs
+      - name: Token colours in the scene
+        run: node tests/token-colors-adapter.test.mjs
+      - name: Band window model
+        run: node tests/band-window-model.test.mjs
+      - name: Band source tokens
+        run: node tests/band-source.test.mjs
+      - name: Band apply in the combat
+        run: node tests/band-apply-adapter.test.mjs
+      - name: Bands window
+        run: node tests/bands-window.test.mjs
+      - name: Band rings on the map
+        run: node tests/band-rings.test.mjs
+      - name: Bands button
+        run: node tests/bands-button.test.mjs
+      - name: Group engine independence
+        run: node tests/group-engine-independence.test.mjs
+      - name: Groups status
+        run: node tests/groups-status.test.mjs
+      - name: Grouping plan
+        run: node tests/group-plan.test.mjs
+      - name: Automatic grouping in the combat
+        run: node tests/auto-groups.test.mjs
+      - name: Group initiative in the combat
+        run: node tests/group-initiative-adapter.test.mjs
+      - name: Maximum table dialog
+        run: node tests/maximums-dialog.test.mjs
+      - name: Band walk rules
+        run: node tests/group-walk.test.mjs
+      - name: Band turns
+        run: node tests/band-turns.test.mjs
+      - name: Turn synchronisation
+        run: node tests/turn-sync.test.mjs
+      - name: Selection limit in the dialog
+        run: node tests/selection-binding.test.mjs
+      - name: GM flow with simulated Foundry objects
+        run: node tests/gm-flow.test.mjs
+      - name: Startup as GM and as player
+        run: node tests/startup.test.mjs
+      - name: Languages
+        run: node tests/lang.test.mjs
+      - name: Manifest and release package
+        run: node tests/manifest.test.mjs
+
+  release:
+    if: github.event_name == 'release'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check that the tag matches the version in module.json
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          CURRENT="$(jq -r .version module.json)"
+          if [ "$VERSION" != "$CURRENT" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match module.json version $CURRENT"
+            exit 1
+          fi
+
+      - name: Set version and download URL from the release tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          DOWNLOAD="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/module.zip"
+          jq --arg v "$VERSION" --arg d "$DOWNLOAD" '.version = $v | .download = $d' module.json > module.tmp
+          mv module.tmp module.json
+
+      - name: Build module.zip
+        run: zip -r module.zip module.json scripts styles templates lang LICENSE README.md CHANGELOG.md
+
+      - name: Attach module.json and module.zip to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$GITHUB_REF_NAME" module.json module.zip --clobber
