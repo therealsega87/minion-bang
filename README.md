@@ -23,6 +23,7 @@ Minion rules for D&D 5e in Foundry VTT: the Minion trait and overkill, as descri
 
   ![Chat message](docs/images/chat-message.png)
 
+- **Shared turns and bands** (optional). Minions of the same kind share one initiative and one turn, split into bands. See below.
 - **Defeated minions** get the Dead status and, in combat, the defeated mark (left to Midi-QOL when it already applies them). Who killed each minion, and in which round and turn, is stored in `flags.minion-bang.killedBy` for statistics modules and macros.
 
 ## Requirements
@@ -78,9 +79,23 @@ await actor.setFlag("dnd5e", "minionBangMinion", true);
 
 Attack minions as usual. When an attack deals damage to a minion, Minion! applies the Minion trait. If the attack was a weapon attack by a player character and the damage exceeds the minion's hit point maximum, the overkill dialog opens for the attacking player, or for the GM when that player isn't connected. Minions that are hidden, or have the Invisible or Ethereal status, are never offered, and the others are listed with their token names.
 
+### Shared turns and bands
+
+Turn on **Shared turns and bands** in the module settings (world setting, off by default). It uses the native combatant groups of Foundry, so **Squad Combat Initiative must be off**.
+
+- **Automatic groups.** Minions of the same stat block that join a combat before initiative is rolled are grouped in blocks of the size given by the table of the rules (5, 8 or 10 by challenge rating). What is left forms a smaller group. A lone minion makes no group.
+- **One step in the tracker.** A band takes one turn: the GM passes the turn and the module walks through its members one by one.
+- **Initiative of a group.** Chosen in the settings: the captain's roll, or the average, highest, lowest or median of the rolls of all members. Each band can also have its own mode and captain.
+- **"Groups and bands" window.** The button is in the header of the combat tracker (GM only). It splits the minions of the scene into bands before the fight, with a color, a captain and a mode for each band, and adds them to the combat (creating it if needed) without rolling initiative. The tab **Existing bands** changes color, mode and captain of the bands already in the combat; mode and captain only until the band has rolled initiative.
+- **Colors on the map.** Each band has a color, shown to everyone as the ring of the token (Dynamic Token Ring) or as a circle.
+- **Maximum band size.** The table is editable in the settings (**Edit the table**). The default is the table of the rules: changing it affects game balance.
+
 ## Settings
 
 - **Preselect the proposed minions** (world, on by default): when on, the overkill dialog opens with the nearest minions already checked. When off, nothing is checked and the player picks the minions; the limit still applies.
+- **Shared turns and bands** (world, off by default): see above.
+- **Initiative of the groups** (world, default captain's roll): how the initiative of a group is decided.
+- **Maximum band size** (world): the table of the maximum creatures per band.
 - **Enable Debug** (per user): detailed logs in the browser console for every damage event on a minion.
 - **Run Diagnostics**: runs a self-test of the rules engine and lets you download a report with versions, settings and recent activity.
 
@@ -93,6 +108,15 @@ Attack minions as usual. When an attack deals damage to a minion, Minion! applie
 - Overkill is checked when the GM is viewing the scene where the attack happens. Otherwise the hit minion still dies, but no overkill is offered.
 - Damage added after the attack by on-demand automations (such as CPR, GPS and similar modules) is not counted towards overkill yet.
 - Scenes measured in meters have not been tested.
+- Shared turns: when the turn walks through a band, the reaction mark of the other members stays visible during the band's action, and their start-of-turn effects trigger when the turn reaches them, as it moves along. "Previous turn" goes back to the first member without start or end of turn effects.
+- Bands made by the automatic grouping have no color and no captain: use the "Groups and bands" window (tab Existing bands) to give them.
+- In the captain's roll mode, if the captain cannot roll, nobody rolls and the module does not warn.
+- When a member of a group rolls, the group can show for a fraction of a second the value copied by dnd5e before the module sets the right one.
+- In the modes Average, Highest, Lowest and Median every member rolls, so the chat gets one roll card per member, plus the summary card for the GM.
+
+## Other modules
+
+Combat Stats and Deep Combat Stats (modes "MidiQOL auto" and "MidiQOL manual") are handled directly: the extra minions downed by an overkill count as kills for the character who triggered the overkill. This uses two internal methods of these modules, so a future version of them may need an update of Minion!.
 
 ## Reporting a bug
 
