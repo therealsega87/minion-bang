@@ -1,30 +1,56 @@
 import { getRecentLogs } from "../scripts/log.js";
 
 const order = [];
-let mode = "midi-manual";
-let moduleActive = true;
-let deepActive = false;
-let deepMode = "midi-manual";
-const pendingMap = new Map();
-const stats = {
-  _midiPending: pendingMap,
-  _processMidiRoll(data) { order.push(["manual", data]); pendingMap.set(data.damageList[0].actorId, data); },
-  _processMidiAutoRoll(data) { order.push(["auto", data]); },
-  _resolveAttribution(actor) { return actor.owner ?? actor; }
-};
-const attackerActor = { id: "a1", name: "Akra", type: "character" };
-const tokens = { "Scene.S.Token.T1": { actor: attackerActor } };
+const store = new Map();
+let modes = {};
+let active = new Set();
+let failWrite = false;
+
+function makeTracker(label) {
+  return {
+    label,
+    _accKill(current, actorId, actorName, victimName, bucket) {
+      order.push([`${label}-kill`, actorId, victimName, bucket]);
+      current.characters ??= {};
+      current.characters[actorId] ??= { id: actorId, name: actorName, kills: 0, damageDealt: 0 };
+      current.characters[actorId].kills += 1;
+    },
+    _resolveAttribution(actor) { return actor.owner ?? actor; },
+    _isPlayerSummon(actor) { return actor.summon === true; }
+  };
+}
+
+const stats = makeTracker("cs");
+const deeper = makeTracker("deeper");
+const pc = { id: "a1", name: "Akra", type: "character" };
+const tokens = { "Scene.S.Token.T1": { actor: pc } };
+let randomCounter = 0;
 globalThis.fromUuidSync = uuid => tokens[uuid] ?? null;
+globalThis.foundry = { utils: { randomID: () => `r${++randomCounter}` } };
 globalThis.game = {
   user: { isGM: true },
-  modules: { get: id => (id === "combat-stats" ? { active: moduleActive } : id === "deeper-combat-stats" && deepActive ? { active: true } : undefined) },
-  settings: { get: (module, key) => { if (module === "combat-stats" && key === "trackerMode") return mode; if (module === "deeper-combat-stats" && key === "trackerMode") { if (deepMode === "missing") throw new Error("no setting"); return deepMode; } throw new Error("unexpected setting"); } },
-  combatStats: stats
+  modules: { get: id => (active.has(id) ? { active: true } : undefined) },
+  settings: {
+    get(module, key) {
+      if (key === "trackerMode") {
+        if (modes[module] === "missing") throw new Error("no setting");
+        return modes[module];
+      }
+      if (key === "currentCombatData") return structuredClone(store.get(module));
+      throw new Error("unexpected setting");
+    },
+    async set(module, key, value) {
+      if (failWrite) throw new Error("write failed");
+      order.push([`${module}-save`]);
+      store.set(module, structuredClone(value));
+    }
+  }
 };
 
 const { updateWithKillCredit } = await import("../scripts/adapters/combat-stats-credit.js");
-const minion = (hp = 6) => ({ id: "m1", uuid: "Actor.m1", system: { attributes: { hp: { value: hp } } } });
+const minion = (extra = {}) => ({ id: "m1", name: "Goblin Lackey", ...extra });
 const record = { attackerTokenUuid: "Scene.S.Token.T1", attackerName: "Akra" };
+const fight = () => ({ combatId: "c1", characters: { a1: { id: "a1", name: "Akra", kills: 1, damageDealt: 7 } }, defeated: [{ name: "Goblin Lackey", id: "m0" }] });
 
 let failed = 0, total = 0;
 const check = (label, actual, expected) => {
@@ -33,31 +59,51 @@ const check = (label, actual, expected) => {
   if (!pass) failed++;
   console.log(`${pass ? "  OK" : "FAIL"}  ${label}${pass ? "" : `\n      expected: ${JSON.stringify(expected)}\n      actual:   ${JSON.stringify(actual)}`}`);
 };
-const reset = () => { order.length = 0; pendingMap.clear(); mode = "midi-manual"; moduleActive = true; deepActive = false; deepMode = "midi-manual"; game.user.isGM = true; game.combatStats = stats; delete game.deeperCombatStats; };
-const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, "Mace", async () => { order.push(["update"]); });
+const reset = () => {
+  order.length = 0; store.clear(); randomCounter = 0; failWrite = false;
+  modes = { "combat-stats": "midi-manual", "deeper-combat-stats": "midi-manual" };
+  active = new Set(["combat-stats"]);
+  game.user.isGM = true;
+  game.combatStats = stats;
+  delete game.deeperCombatStats;
+  store.set("combat-stats", fight());
+  store.set("deeper-combat-stats", fight());
+};
+const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, async () => { order.push(["update"]); });
 
 {
   reset();
   await run();
-  check("manual: Combat Stats is told BEFORE the update, with the attacker of the overkill", order.map(o => o[0]), ["manual", "update"]);
-  check("manual: the attacker is the character, the damage is the minion's hit points", [order[0][1].attacker, order[0][1].damageList[0].oldHP, order[0][1].itemName], [{ id: "a1", name: "Akra", type: "character" }, 6, "Mace"]);
+  check("the minion is updated first, then the kill is counted and saved", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save"]);
+  const saved = store.get("combat-stats");
+  check("one more kill for the character who made the overkill", saved.characters.a1.kills, 2);
+  check("no damage is added: the damage dealt stays the roll", saved.characters.a1.damageDealt, 7);
+  check("the kill goes to the characters, with the minion's name", order[1].slice(1), ["a1", "Goblin Lackey", "characters"]);
+  check("the minion joins the defeated enemies", saved.defeated, [{ name: "Goblin Lackey", id: "m0" }, { name: "Goblin Lackey", id: "m1", tokenUuid: "r1", killedBy: "a1" }]);
 }
 {
-  reset(); mode = "midi-auto";
+  reset(); modes["combat-stats"] = "midi-auto";
   await run();
-  check("auto: Combat Stats is told AFTER the update", order.map(o => o[0]), ["update", "auto"]);
-  check("auto: the entry goes from 6 hit points to 0", [order[1][1].damageList[0].oldHP, order[1][1].damageList[0].newHP], [6, 0]);
+  check("auto mode: the same kill, no damage", [order.map(o => o[0]), store.get("combat-stats").characters.a1], [["update", "cs-kill", "combat-stats-save"], { id: "a1", name: "Akra", kills: 2, damageDealt: 7 }]);
 }
 {
-  reset(); mode = "native";
+  reset(); modes["combat-stats"] = "native";
   await run();
-  check("native mode: only the update", order.map(o => o[0]), ["update"]);
+  check("native mode: only the update (Combat Stats counts the kill on its own)", order.map(o => o[0]), ["update"]);
 }
 {
-  reset(); moduleActive = false;
+  reset(); store.set("combat-stats", { combatId: null, characters: {} });
+  await run();
+  check("no fight being recorded: only the update", order.map(o => o[0]), ["update"]);
+  reset(); store.set("combat-stats", { combatId: "c1", characters: {} });
+  await run();
+  check("a fight without a defeated list gets one", store.get("combat-stats").defeated.length, 1);
+}
+{
+  reset(); active = new Set();
   await run();
   check("Combat Stats not active: only the update", order.map(o => o[0]), ["update"]);
-  reset(); game.combatStats = undefined;
+  reset(); delete game.combatStats;
   await run();
   check("Combat Stats without its tracker: only the update", order.map(o => o[0]), ["update"]);
   reset(); game.user.isGM = false;
@@ -66,73 +112,61 @@ const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, "Mace",
 }
 {
   reset();
-  await run(minion(6), { attackerTokenUuid: "Scene.S.Token.NONE" });
-  check("unknown attacker: the minion is still killed, nothing is credited", order.map(o => o[0]), ["update"]);
+  await run(minion(), { attackerTokenUuid: "Scene.S.Token.NONE" });
+  check("unknown attacker: only the update", order.map(o => o[0]), ["update"]);
   reset();
-  await run(minion(6), { attackerTokenUuid: null });
+  await run(minion(), { attackerTokenUuid: null });
   check("no attacker in the record: only the update", order.map(o => o[0]), ["update"]);
-  reset();
-  const warnsBefore = getRecentLogs().filter(l => l.level === "warn").length;
-  await run(minion(0));
-  check("a minion with 0 hit points is not credited, and it is not a warning", [order.map(o => o[0]), getRecentLogs().filter(l => l.level === "warn").length - warnsBefore], [["update"], 0]);
 }
 {
   reset();
-  const owner = { id: "p1", name: "Owner", type: "character" };
-  tokens["Scene.S.Token.WOLF"] = { actor: { id: "w1", name: "Wolf", type: "npc", owner } };
+  tokens["Scene.S.Token.WOLF"] = { actor: { id: "w1", name: "Wolf", type: "npc", owner: { id: "p1", name: "Owner", type: "character" } } };
   await run(minion(), { attackerTokenUuid: "Scene.S.Token.WOLF" });
-  check("a summon is credited to its owner, as Combat Stats does", order[0][1].attacker.id, "p1");
-}
-{
+  check("a summon's overkill is credited to its owner", order[1]?.[1], "p1");
   reset();
-  stats._processMidiRoll = () => { throw new Error("boom"); };
-  await run();
-  check("if Combat Stats fails, the minion is still killed and a warning is logged", [order.map(o => o[0]), getRecentLogs().some(l => l.level === "warn" && l.text.includes("could not be passed"))], [["update"], true]);
-  stats._processMidiRoll = data => { order.push(["manual", data]); pendingMap.set(data.damageList[0].actorId, data); };
+  tokens["Scene.S.Token.NPC"] = { actor: { id: "n1", name: "Bandit", type: "npc" } };
+  await run(minion(), { attackerTokenUuid: "Scene.S.Token.NPC" });
+  check("an attacker that is not a player character gets nothing", order.map(o => o[0]), ["update"]);
+  reset();
+  await run(minion({ summon: true }));
+  check("a minion summoned by a player is not a kill", order.map(o => o[0]), ["update"]);
 }
 {
   reset();
   let error = null;
-  try { await updateWithKillCredit(minion(), record, "Mace", async () => { throw new Error("update failed"); }); } catch (e) { error = e.message; }
-  check("if the update fails the error goes on and the pending entry is removed", [error, pendingMap.size], ["update failed", 0]);
+  try { await updateWithKillCredit(minion(), record, async () => { throw new Error("update failed"); }); } catch (e) { error = e.message; }
+  check("if the update fails the error goes on and nothing is credited", [error, order.length], ["update failed", 0]);
 }
 {
-  reset(); mode = "midi-auto";
-  stats._processMidiAutoRoll = () => { throw new Error("boom"); };
+  reset(); failWrite = true;
   await run();
-  check("auto: if Combat Stats fails after the update, nothing breaks", order.map(o => o[0]), ["update"]);
+  check("if the save fails, the minion is still down and a warning is logged", [order.map(o => o[0]), getRecentLogs().some(l => l.level === "warn" && l.text.includes("could not be passed"))], [["update", "cs-kill"], true]);
 }
 {
   reset();
-  delete stats._processMidiRoll;
+  const saved = stats._accKill;
+  delete stats._accKill;
   await run();
+  stats._accKill = saved;
   check("Combat Stats with other internals: nothing is credited, a warning is logged", [order.map(o => o[0]), getRecentLogs().some(l => l.level === "warn" && l.text.includes("not the ones expected"))], [["update"], true]);
 }
-
 {
-  stats._processMidiRoll = data => { order.push(["manual", data]); pendingMap.set(data.damageList[0].actorId, data); };
-  stats._processMidiAutoRoll = data => { order.push(["auto", data]); };
-  const deepOrder = [];
-  const deep = { _midiPending: new Map(), _processMidiRoll: data => deepOrder.push(["deep-manual", data.attacker.id]), _processMidiAutoRoll: data => deepOrder.push(["deep-auto", data.attacker.id]) };
-  reset(); moduleActive = false; deepActive = true; game.deeperCombatStats = deep;
+  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.deeperCombatStats = deeper;
   await run();
-  check("Deeper Combat Stats alone: credited before the update in manual mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-manual", "a1"]]]);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; deepMode = "midi-auto"; game.deeperCombatStats = deep;
+  check("Deeper Combat Stats alone: the kill goes there", order.map(o => o[0]), ["update", "deeper-kill", "deeper-combat-stats-save"]);
+  reset(); active = new Set(["combat-stats", "deeper-combat-stats"]); game.deeperCombatStats = deeper;
   await run();
-  check("Deeper Combat Stats alone: credited after the update in auto mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-auto", "a1"]]]);
-  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.deeperCombatStats = deep;
+  check("both modules active: each one counts the kill once", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save", "deeper-kill", "deeper-combat-stats-save"]);
+  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.combatStats = deeper;
   await run();
-  check("both modules active: each one is told once", [order.map(o => o[0]), deepOrder.length], [["manual", "update"], 1]);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; delete game.deeperCombatStats; game.combatStats = deep;
+  check("Deeper Combat Stats exposed as game.combatStats is found too", order.map(o => o[0]), ["update", "deeper-kill", "deeper-combat-stats-save"]);
+  reset(); active = new Set(["combat-stats", "deeper-combat-stats"]); game.deeperCombatStats = stats;
   await run();
-  check("Deeper Combat Stats exposed as game.combatStats is found too", deepOrder.length, 1);
-  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.combatStats = stats; game.deeperCombatStats = stats;
+  check("the same tracker seen from two modules counts the kill once", order.filter(o => o[0] === "cs-kill").length, 1);
+  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.deeperCombatStats = deeper; modes["deeper-combat-stats"] = "missing";
   await run();
-  check("the same tracker seen from two modules is told only once", order.filter(o => o[0] === "manual").length, 1);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; game.deeperCombatStats = deep; deepMode = "missing";
-  await run();
-  check("Deeper Combat Stats without the mode setting: nothing is credited, no error", [order.map(o => o[0]), deepOrder.length], [["update"], 0]);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; delete game.combatStats;
+  check("Deeper Combat Stats without the mode setting: nothing, no error", order.map(o => o[0]), ["update"]);
+  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats;
   await run();
   check("Deeper Combat Stats active but no tracker found: only the update", order.map(o => o[0]), ["update"]);
 }

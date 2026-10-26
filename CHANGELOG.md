@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.2
+
+- Fix: with Combat Stats, the minions downed by an overkill now count as kills only. They no longer add their hit points to the damage dealt, so the damage dealt matches the roll.
+
 ## 1.5.1
 
 - Fix: overkill kills are credited again to the second statistics module supported by Minion! (wrong module id in 1.5.0).

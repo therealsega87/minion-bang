@@ -405,15 +405,27 @@ function check(label, actual, expected) {
 
 {
   const calls = [];
-  const savedSettings = game.settings.get;
+  let fight = { combatId: "c1", characters: {}, defeated: [] };
+  const savedGet = game.settings.get;
+  const savedSet = game.settings.set;
+  const savedUtils = foundry.utils;
   game.user.isGM = true;
-  game.settings.get = (module, key) => (module === "combat-stats" && key === "trackerMode" ? "midi-manual" : savedSettings(module, key));
-  game.combatStats = { _processMidiRoll: data => calls.push(data), _processMidiAutoRoll() {}, _resolveAttribution: actor => actor };
+  foundry.utils = { ...(savedUtils ?? {}), randomID: () => "rid" };
+  game.settings.get = (module, key) => {
+    if (module === "combat-stats" && key === "trackerMode") return "midi-manual";
+    if (module === "combat-stats" && key === "currentCombatData") return structuredClone(fight);
+    return savedGet(module, key);
+  };
+  game.settings.set = async (module, key, value) => { if (module === "combat-stats") fight = structuredClone(value); };
+  game.combatStats = { _accKill: (current, id, name, victim) => calls.push({ id, name, victim }), _resolveAttribution: actor => actor };
   const r = await runScenario({ damage: 10, script: [3, 2, 1] });
   delete game.combatStats;
-  game.settings.get = savedSettings;
+  game.settings.get = savedGet;
+  game.settings.set = savedSet;
+  foundry.utils = savedUtils;
   delete game.user.isGM;
-  check("Combat Stats is told about every extra minion killed by the overkill, with the attacker as author", [r.killed.length, calls.length, [...new Set(calls.map(c => c.attacker.name))]], [r.killed.length, r.killed.length, ["Akra"]]);
+  check("Combat Stats counts a kill for every extra minion killed by the overkill, with the attacker as author", [r.killed.length, calls.length, [...new Set(calls.map(c => c.name))]], [r.killed.length, r.killed.length, ["Akra"]]);
+  check("the extra minions join the defeated enemies", fight.defeated.length, r.killed.length);
   check("at least one extra minion was killed in that scenario", r.killed.length > 0, true);
 }
 

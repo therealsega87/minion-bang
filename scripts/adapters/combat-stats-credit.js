@@ -1,10 +1,11 @@
-import { buildKillSnapshot, creditTiming } from "../engine/kill-credit.js";
+import { creditsOverkillKills, defeatedEntry } from "../engine/kill-credit.js";
 import { debugLog, warnLog } from "../log.js";
 
 const TRACKERS = Object.freeze([
   { moduleId: "combat-stats", instanceKeys: ["combatStats"] },
   { moduleId: "deeper-combat-stats", instanceKeys: ["deeperCombatStats", "combatStats"] }
 ]);
+const CURRENT_KEY = "currentCombatData";
 
 function readTrackers() {
   if (!game.user?.isGM) return [];
@@ -18,76 +19,63 @@ function readTrackers() {
       continue;
     }
     if (seen.has(stats)) continue;
-    let timing = null;
+    let mode;
     try {
-      timing = creditTiming(game.settings.get(moduleId, "trackerMode"));
+      mode = game.settings.get(moduleId, "trackerMode");
     } catch {
       debugLog(`${moduleId} has no "trackerMode" setting: nothing to credit.`);
       continue;
     }
-    if (!timing) continue;
-    if (typeof stats._processMidiRoll !== "function" || typeof stats._processMidiAutoRoll !== "function") {
+    if (!creditsOverkillKills(mode)) continue;
+    if (typeof stats._accKill !== "function") {
       warnLog(`${moduleId} is active but its internals are not the ones expected: the extra kills are not credited.`);
       continue;
     }
     seen.add(stats);
-    found.push({ stats, timing });
+    found.push({ moduleId, stats });
   }
   return found;
 }
 
-function buildSnapshot(stats, minion, record, itemName) {
+function attackerOf(record) {
   const token = record?.attackerTokenUuid ? fromUuidSync(record.attackerTokenUuid) : null;
-  const actor = token?.actor ?? null;
+  return token?.actor ?? null;
+}
+
+async function creditKill({ moduleId, stats }, minion, record) {
+  const actor = attackerOf(record);
   if (!actor) {
-    debugLog("Combat Stats: the attacker of the overkill is unknown, the extra kill is not credited.");
-    return null;
+    debugLog(`${moduleId}: the attacker of the overkill is unknown, the extra kill is not credited.`);
+    return;
   }
   const credited = stats._resolveAttribution?.(actor) ?? actor;
-  const oldHP = minion.system?.attributes?.hp?.value ?? 0;
-  if (!(oldHP > 0)) return null;
-  return buildKillSnapshot({
-    attacker: { id: credited.id, name: credited.name, type: credited.type },
-    itemName,
-    minion: { id: minion.id, uuid: minion.uuid },
-    oldHP
-  });
-}
-
-function forgetPending(stats, actorId) {
-  try {
-    stats._midiPending?.delete(actorId);
-  } catch (error) {
-    debugLog("Combat Stats: a pending kill could not be removed:", error);
+  if (credited.type !== "character") {
+    debugLog(`${moduleId}: ${credited.name} is not a player character, the extra kill is not credited.`);
+    return;
   }
+  if (stats._isPlayerSummon?.(minion)) return;
+  const current = game.settings.get(moduleId, CURRENT_KEY);
+  if (!current?.combatId) {
+    debugLog(`${moduleId}: no fight is being recorded, the extra kill is not credited.`);
+    return;
+  }
+  stats._accKill(current, credited.id, credited.name, minion.name, "characters");
+  if (!Array.isArray(current.defeated)) current.defeated = [];
+  current.defeated.push(defeatedEntry({ minion, attackerId: credited.id, uniqueId: foundry.utils.randomID() }));
+  await game.settings.set(moduleId, CURRENT_KEY, current);
 }
 
-export async function updateWithKillCredit(minion, record, itemName, update) {
-  let prepared = [];
+export async function updateWithKillCredit(minion, record, update) {
+  await update();
+  let trackers = [];
   try {
-    for (const found of readTrackers()) {
-      const snapshot = buildSnapshot(found.stats, minion, record, itemName);
-      if (snapshot) prepared.push({ ...found, snapshot });
-    }
-    for (const entry of prepared) {
-      if (entry.timing === "before") entry.stats._processMidiRoll(entry.snapshot);
-    }
+    trackers = readTrackers();
   } catch (error) {
     warnLog("The extra kill could not be passed to Combat Stats:", error);
-    prepared = [];
   }
-
-  try {
-    await update();
-  } catch (error) {
-    for (const entry of prepared) forgetPending(entry.stats, minion.id);
-    throw error;
-  }
-
-  for (const entry of prepared) {
-    if (entry.timing !== "after") continue;
+  for (const tracker of trackers) {
     try {
-      entry.stats._processMidiAutoRoll(entry.snapshot);
+      await creditKill(tracker, minion, record);
     } catch (error) {
       warnLog("The extra kill could not be passed to Combat Stats:", error);
     }

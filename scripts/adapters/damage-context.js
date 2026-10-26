@@ -374,7 +374,7 @@ async function runOverkillConfirmation(decidingUserId, payload) {
       continue;
     }
     try {
-      await updateWithKillCredit(minion, payload.killRecord, payload.weaponName, () => minion.update({
+      await updateWithKillCredit(minion, payload.killRecord, () => minion.update({
         "system.attributes.hp.value": 0,
         "system.attributes.hp.temp": 0,
         [`flags.${MODULE_ID}.killedBy`]: payload.killRecord
