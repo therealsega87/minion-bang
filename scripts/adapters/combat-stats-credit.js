@@ -3,7 +3,7 @@ import { debugLog, warnLog } from "../log.js";
 
 const TRACKERS = Object.freeze([
   { moduleId: "combat-stats", instanceKeys: ["combatStats"] },
-  { moduleId: "deep-combat-stats", instanceKeys: ["deepCombatStats", "combatStats"] }
+  { moduleId: "deeper-combat-stats", instanceKeys: ["deeperCombatStats", "combatStats"] }
 ]);
 
 function readTrackers() {

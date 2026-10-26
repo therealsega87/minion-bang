@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.1
+
+- Fix: overkill kills are credited again to the second statistics module supported by Minion! (wrong module id in 1.5.0).
+
 ## 1.5.0
 
 The versions 1.3.x were test builds that were never published, and 1.4 was skipped: this release follows 1.2.0 and gathers everything.

@@ -17,8 +17,8 @@ const tokens = { "Scene.S.Token.T1": { actor: attackerActor } };
 globalThis.fromUuidSync = uuid => tokens[uuid] ?? null;
 globalThis.game = {
   user: { isGM: true },
-  modules: { get: id => (id === "combat-stats" ? { active: moduleActive } : id === "deep-combat-stats" && deepActive ? { active: true } : undefined) },
-  settings: { get: (module, key) => { if (module === "combat-stats" && key === "trackerMode") return mode; if (module === "deep-combat-stats" && key === "trackerMode") { if (deepMode === "missing") throw new Error("no setting"); return deepMode; } throw new Error("unexpected setting"); } },
+  modules: { get: id => (id === "combat-stats" ? { active: moduleActive } : id === "deeper-combat-stats" && deepActive ? { active: true } : undefined) },
+  settings: { get: (module, key) => { if (module === "combat-stats" && key === "trackerMode") return mode; if (module === "deeper-combat-stats" && key === "trackerMode") { if (deepMode === "missing") throw new Error("no setting"); return deepMode; } throw new Error("unexpected setting"); } },
   combatStats: stats
 };
 
@@ -33,7 +33,7 @@ const check = (label, actual, expected) => {
   if (!pass) failed++;
   console.log(`${pass ? "  OK" : "FAIL"}  ${label}${pass ? "" : `\n      expected: ${JSON.stringify(expected)}\n      actual:   ${JSON.stringify(actual)}`}`);
 };
-const reset = () => { order.length = 0; pendingMap.clear(); mode = "midi-manual"; moduleActive = true; deepActive = false; deepMode = "midi-manual"; game.user.isGM = true; game.combatStats = stats; delete game.deepCombatStats; };
+const reset = () => { order.length = 0; pendingMap.clear(); mode = "midi-manual"; moduleActive = true; deepActive = false; deepMode = "midi-manual"; game.user.isGM = true; game.combatStats = stats; delete game.deeperCombatStats; };
 const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, "Mace", async () => { order.push(["update"]); });
 
 {
@@ -114,27 +114,27 @@ const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, "Mace",
   stats._processMidiAutoRoll = data => { order.push(["auto", data]); };
   const deepOrder = [];
   const deep = { _midiPending: new Map(), _processMidiRoll: data => deepOrder.push(["deep-manual", data.attacker.id]), _processMidiAutoRoll: data => deepOrder.push(["deep-auto", data.attacker.id]) };
-  reset(); moduleActive = false; deepActive = true; game.deepCombatStats = deep;
+  reset(); moduleActive = false; deepActive = true; game.deeperCombatStats = deep;
   await run();
-  check("Deep Combat Stats alone: credited before the update in manual mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-manual", "a1"]]]);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; deepMode = "midi-auto"; game.deepCombatStats = deep;
+  check("Deeper Combat Stats alone: credited before the update in manual mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-manual", "a1"]]]);
+  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; deepMode = "midi-auto"; game.deeperCombatStats = deep;
   await run();
-  check("Deep Combat Stats alone: credited after the update in auto mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-auto", "a1"]]]);
-  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.deepCombatStats = deep;
+  check("Deeper Combat Stats alone: credited after the update in auto mode", [order.map(o => o[0]), deepOrder], [["update"], [["deep-auto", "a1"]]]);
+  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.deeperCombatStats = deep;
   await run();
   check("both modules active: each one is told once", [order.map(o => o[0]), deepOrder.length], [["manual", "update"], 1]);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; delete game.deepCombatStats; game.combatStats = deep;
+  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; delete game.deeperCombatStats; game.combatStats = deep;
   await run();
-  check("Deep Combat Stats exposed as game.combatStats is found too", deepOrder.length, 1);
-  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.combatStats = stats; game.deepCombatStats = stats;
+  check("Deeper Combat Stats exposed as game.combatStats is found too", deepOrder.length, 1);
+  deepOrder.length = 0; reset(); moduleActive = true; deepActive = true; game.combatStats = stats; game.deeperCombatStats = stats;
   await run();
   check("the same tracker seen from two modules is told only once", order.filter(o => o[0] === "manual").length, 1);
-  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; game.deepCombatStats = deep; deepMode = "missing";
+  deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; game.deeperCombatStats = deep; deepMode = "missing";
   await run();
-  check("Deep Combat Stats without the mode setting: nothing is credited, no error", [order.map(o => o[0]), deepOrder.length], [["update"], 0]);
+  check("Deeper Combat Stats without the mode setting: nothing is credited, no error", [order.map(o => o[0]), deepOrder.length], [["update"], 0]);
   deepOrder.length = 0; reset(); moduleActive = false; deepActive = true; delete game.combatStats;
   await run();
-  check("Deep Combat Stats active but no tracker found: only the update", order.map(o => o[0]), ["update"]);
+  check("Deeper Combat Stats active but no tracker found: only the update", order.map(o => o[0]), ["update"]);
 }
 
 console.log(`\n${total - failed} passed, ${failed} failed, ${total} total.\n`);
