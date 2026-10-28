@@ -20,4 +20,4 @@
 ## Other modules
 
 - Squad Combat Initiative can't run alongside shared turns and bands.
-- The Combat Stats support relies on internal functions of that module. A future version of Combat Stats may need a Minion! update.
+- With Combat Stats before 4.4.0, the overkill credit relies on internal functions of that module. A later version may need a Minion! update.

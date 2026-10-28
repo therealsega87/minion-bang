@@ -16,7 +16,7 @@ Midi-QOL depends on DAE and libWrapper. Foundry offers to install them along wit
 | Module | What it adds |
 |---|---|
 | *Flee, Mortals!* (MCDM module) | Its minions are recognized with no setup. |
-| Combat Stats | Overkill kills are credited. See [Combat Stats](combat-stats.md). Tested with 4.3.0. |
+| Combat Stats | From 4.4.0, minion kills get their own count. Older versions get the overkill kills from Minion!. See [Combat Stats](combat-stats.md). |
 | Dynamic Token Ring (built into Foundry) | Band colors show on the token ring. Without it, Minion! draws a circle. |
 
 ## Doesn't work with
@@ -33,4 +33,4 @@ Midi-QOL depends on DAE and libWrapper. Foundry offers to install them along wit
 
 ## After you update another module
 
-Minion! reads internal values of Midi-QOL, dnd5e and Combat Stats, and a new version can change them. After updating any of them, run a short test fight before the session. See [Updating](../getting-started/updating.md#before-a-session).
+Minion! reads internal values of Midi-QOL and dnd5e, and of Combat Stats before 4.4.0. A new version can change them. After updating any of them, run a short test fight before the session. See [Updating](../getting-started/updating.md#before-a-session).

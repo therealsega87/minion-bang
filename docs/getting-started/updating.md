@@ -13,7 +13,7 @@ When the world loads, Minion! writes its version in the browser console (++f12++
 
 ## Combat Stats
 
-If you use Combat Stats and change its mode, reload with ++f5++ as Combat Stats asks. Combat Stats only switches mode after a reload. See [Combat Stats](../reference/combat-stats.md).
+If you use Combat Stats and change its mode or its **Track Minion! kills** setting, reload with ++f5++ as Combat Stats asks. Combat Stats only applies those changes after a reload. See [Combat Stats](../reference/combat-stats.md).
 
 ## Before a session
 

@@ -28,7 +28,7 @@ Minion! reads the damage Midi-QOL calculates, so Midi-QOL is required. [Compatib
 ## Optional modules
 
 - ***Flee, Mortals!*** (MCDM): Minion! recognizes its minions with no setup.
-- **Combat Stats**: the minions downed by an overkill count as kills for the character who made it. See [Combat Stats](../reference/combat-stats.md).
+- **Combat Stats**: from version 4.4.0 it counts minion kills apart from ordinary kills, overkill included. See [Combat Stats](../reference/combat-stats.md).
 
 !!! warning "Squad Combat Initiative"
     Squad Combat Initiative manages the same combatant groups that Minion! uses for [shared turns and bands](../bands/index.md), so the two can't run together. Turn it off before you turn bands on. While both are active, Minion! keeps its groups off and warns the GM. The Minion trait and overkill work either way.

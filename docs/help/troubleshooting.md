@@ -45,13 +45,17 @@ Squad Combat Initiative manages the same groups. Turn it off in **Manage Modules
 
 The GM gets a notification when the turn can't reach every member. Open the console (++f12++) for the details, and [report it](bug-report.md).
 
+## Combat Stats doesn't show minion kills
+
+Separate minion kills need Combat Stats 4.4.0 or later with **Track Minion! kills** on. Combat Stats applies that setting after a reload, and only counts kills in the combat it's recording, once it has started. See [Combat Stats](../reference/combat-stats.md).
+
 ## Combat Stats counts a minion twice
 
 Combat Stats only switches mode after a reload. If you changed its mode, reload Foundry with ++f5++. See [Combat Stats](../reference/combat-stats.md#modes).
 
 ## A console warning about Combat Stats
 
-Minion! relies on internal functions of Combat Stats. If a new version changes them, Minion! writes a warning and stops crediting the extra kills. Overkill keeps working. Please [report it](bug-report.md).
+With Combat Stats before 4.4.0, Minion! relies on internal functions of that module. If they change, Minion! writes a warning and stops crediting the extra kills. Overkill keeps working. Updating Combat Stats to 4.4.0 or later avoids it, otherwise please [report it](bug-report.md).
 
 ## Still stuck
 
