@@ -11,6 +11,7 @@ function buildAttackDetails(workflow) {
   const range = workflow?.item?.system?.range ?? activity?.range ?? {};
   return {
     itemName: workflow?.item?.name ?? "unknown item",
+    attackId: workflow?.itemCardUuid ?? null,
     activityType: activity?.type ?? null,
     attackMode,
     actionType: activity?.getActionType?.(attackMode) ?? activity?.actionType ?? null,

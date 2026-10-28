@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0
+
+- New hook for other modules: `minion-bang.minionKill`. Minion! calls it on the GM's client each time it downs a minion, with the number of minions downed (the hit one plus those taken down by its overkill), the attacker, the weapon, the challenge rating and band size of each minion. The console shows a line for each call.
+
 ## 1.5.4
 
 - The minions downed by an overkill are passed as kills to Combat Stats only.

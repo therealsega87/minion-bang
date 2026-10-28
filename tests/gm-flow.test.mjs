@@ -1,13 +1,24 @@
 const handlers = new Map();
+let nextHookId = 1;
 globalThis.Hooks = {
   on(name, fn) {
     if (!handlers.has(name)) handlers.set(name, []);
-    handlers.get(name).push(fn);
+    const id = nextHookId++;
+    handlers.get(name).push({ id, fn });
+    return id;
+  },
+  off(name, id) {
+    handlers.set(name, (handlers.get(name) ?? []).filter(h => h.id !== id));
   },
   call(name, ...args) {
-    for (const fn of handlers.get(name) ?? []) fn(...args);
+    for (const { fn } of [...(handlers.get(name) ?? [])]) fn(...args);
+  },
+  callAll(name, ...args) {
+    for (const { fn } of [...(handlers.get(name) ?? [])]) fn(...args);
   }
 };
+const minionKills = [];
+Hooks.on("minion-bang.minionKill", data => { minionKills.push(data); });
 
 class FakeGraphics {
   constructor() { this.destroyed = false; this.alpha = null; }
@@ -222,6 +233,7 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   if (tweak) tweak({ attacker, hit, others });
 
   const workflow = {
+    itemCardUuid: "ChatMessage.card1",
     activity: { type: "attack", getActionType: () => "mwak" },
     attackMode: "oneHanded",
     item: { name: "Longsword", system: { range: { reach: 5, value: null, units: "ft" } } },
@@ -237,12 +249,17 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [], options);
 
   const updates = {};
+  minionKills.length = 0;
   applyMinionDamage(hit.actor, -6, updates, options);
+  if (updates["system.attributes.hp.value"] === 0) {
+    hit.actor.system.attributes.hp.value = 0;
+    Hooks.call("updateActor", hit.actor, { system: { attributes: { hp: { value: 0 } } } });
+  }
   for (let i = 0; i < 20 && !chat.length && !dialogState.template; i += 1) await new Promise(r => setTimeout(r, 10));
   await new Promise(r => setTimeout(r, 50));
 
   const killed = others.filter(t => t.actor.updates.length > 0).map(t => t.id);
-  return { updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
+  return { minionKills: [...minionKills], updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
 }
 
 let failures = 0;
@@ -507,6 +524,25 @@ function check(label, actual, expected) {
 {
   const r = await runScenario({ damage: 6 });
   check("6 damage on 6 HP: no overkill dialog", r.template, null);
+}
+
+{
+  const r = await runScenario({ damage: 19, script: [] });
+  const k = r.minionKills;
+  check("minionKill: one call for the hit minion and its overkill", k.length, 1);
+  check("minionKill: 19 damage, 3 more down, counts 4", [k[0]?.count, k[0]?.overkillCount], [4, 3]);
+  check("minionKill: the hit minion comes first, then the overkill ones", k[0]?.kills.map(x => [x.tokenUuid, x.overkill]), [["Scene.s.Token.g0", false], ["Scene.s.Token.g1", true], ["Scene.s.Token.g2", true], ["Scene.s.Token.g3", true]]);
+  check("minionKill: attacker, weapon and origin are passed", [k[0]?.attacker.tokenUuid, k[0]?.attacker.actorUuid, k[0]?.attacker.name, k[0]?.item, k[0]?.actionType, k[0]?.origin, k[0]?.attackId], ["Scene.s.Token.att", "Actor.att", "Akra", "Longsword", "mwak", "attackHit", "ChatMessage.card1"]);
+}
+{
+  const r = await runScenario({ damage: 6 });
+  check("minionKill: no overkill, one call that counts 1", r.minionKills.map(x => [x.count, x.overkillCount]), [[1, 0]]);
+}
+{
+  const r = await runScenario({ damage: 10, script: ["yes"] });
+  check("minionKill: opportunity attack, only the hit minion counts", r.minionKills.map(x => x.count), [1]);
+  const c = await runScenario({ damage: 10, cancel: true });
+  check("minionKill: overkill cancelled, only the hit minion counts", c.minionKills.map(x => x.count), [1]);
 }
 
 console.log(failures === 0 ? "\nAll GM flow checks passed.\n" : `\n${failures} GM flow check(s) failed.\n`);

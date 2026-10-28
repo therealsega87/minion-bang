@@ -136,6 +136,27 @@ The interface is in English and Italian. Foundry uses the language of each user.
 - In the average, highest, lowest and median modes every member rolls, so the chat gets one roll card per member plus a summary card for the GM.
 - The Combat Stats support uses internal functions of that module. A future version of Combat Stats may need an update of Minion!.
 
+## For module developers
+
+When Minion! downs a minion, the GM's client calls the hook `minion-bang.minionKill` once, after the hit points are written. If the hit starts an overkill, the call waits for the player's choice and counts the hit minion together with the ones the overkill took down: one minion with 3 more by overkill is one call with `count: 4`. A spell that downs several minions makes one call for each of them.
+
+```js
+Hooks.on("minion-bang.minionKill", data => {
+  // data.count          minions downed: the hit one plus the overkill ones
+  // data.overkillCount  how many of them fell to the overkill
+  // data.attacker       { tokenUuid, actorUuid, name, type }
+  // data.item           weapon or spell name
+  // data.actionType     "mwak", "rwak", ...
+  // data.origin         "attackHit", "failedSave" or "otherEffect"
+  // data.attackId       uuid of the attack's chat card: the same for every call of one attack
+  // data.combatId, data.round, data.turn
+  // data.kills          [{ actorUuid, tokenUuid, name, challengeRating, bandSize, overkill }]
+  //                     the hit minion first; bandSize is the maximum band size for its CR
+});
+```
+
+The console also shows a line for each call: `[Minion!] minionKill: Akra downed 4 minion(s), 3 by overkill.`
+
 ## Reporting a bug
 
 1. Turn on **Enable Debug**.
