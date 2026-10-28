@@ -9,9 +9,19 @@ Minion! treats an actor as a minion in either of two cases:
 
 Open the actor sheet, go to **Special Traits** and check **Minion**.
 
+<figure markdown="span">
+  ![The Minion checkbox in the Special Traits tab of an actor sheet](../assets/images/special-traits.png){ width="520" loading=lazy }
+  <figcaption>The <strong>Minion</strong> checkbox in <strong>Special Traits</strong>.</figcaption>
+</figure>
+
 ## The Token HUD button
 
 Right-click a token on the scene. The skull button in the Token HUD (GM only) toggles the mark, and it is red while the actor is a minion.
+
+<figure markdown="span">
+  ![The Token HUD with the red skull button](../assets/images/token-hud.png){ width="300" loading=lazy }
+  <figcaption>The skull button at the bottom right of the Token HUD, red because the actor is a minion.</figcaption>
+</figure>
 
 ## Unlinked tokens
 

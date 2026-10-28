@@ -21,6 +21,11 @@ Values from *Flee, Mortals!* by MCDM Productions. See the book for the full tabl
 3. Change the **Maximum** of any row. The **Default** column shows the original value.
 4. Click **Save**. **Restore default** puts the whole table back.
 
+<figure markdown="span">
+  ![The Maximum band size window with one row per challenge rating](../assets/images/band-size-table.png){ width="300" loading=lazy }
+  <figcaption>The table window. <strong>Default</strong> shows the original value of each row.</figcaption>
+</figure>
+
 Every maximum must be a whole number of at least 2, or the table is not saved. A creature above CR 21 uses the last row.
 
 !!! warning "Balance"

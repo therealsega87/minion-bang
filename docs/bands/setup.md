@@ -27,6 +27,16 @@ Use this when you want the bands, their names, their colors and their captains t
 7. Click **Apply**. A confirmation lists the kinds and the number of bands and singles. Confirm, and Minion! adds everything to the combat, creating one if there is none. **Apply never rolls initiative.**
 8. Roll initiative as usual.
 
+<figure markdown="span">
+  ![The Groups and bands button in the combat tracker](../assets/images/bands-button.png){ width="300" loading=lazy }
+  <figcaption>The <strong>Groups and bands</strong> button, under <strong>Create Combat</strong>.</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![The Groups and bands window with two bands of Goblin Lackeys](../assets/images/bands-window.png){ width="640" loading=lazy }
+  <figcaption>Nine goblin lackeys, a maximum of 5: the window proposes two bands, 5 and 4.</figcaption>
+</figure>
+
 ### What you can change
 
 | Control | What it does |
@@ -45,6 +55,11 @@ Each band row shows how many members it has against how many it needs, for examp
 ### The preview on the map
 
 While the window is open, rings in each band's color mark its members on the scene. Hover over a band's row and its rings get thicker. A minion that stays alone gets a thin grey ring.
+
+<figure markdown="span">
+  ![Rings in each band's color around the minions on the map](../assets/images/bands-preview.png){ width="440" loading=lazy }
+  <figcaption>Rings in each band's color mark the members while the window is open.</figcaption>
+</figure>
 
 ### If creatures changed under you
 

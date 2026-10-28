@@ -2,6 +2,11 @@
 
 When a player character's weapon attack deals more damage than a minion has hit points, the excess takes down more minions of the same kind. Akra swings at a goblin with 6 hit points and deals 20 damage. The goblin dies, and the 14 extra points are enough for three more goblins in reach.
 
+<figure markdown="span">
+  ![A weapon attack drops a minion and the overkill dialog takes down more](../assets/images/overkill.gif){ width="520" loading=lazy }
+  <figcaption>An attack, the overkill dialog and the minions that fall.</figcaption>
+</figure>
+
 ## When overkill happens
 
 All of these must be true:
@@ -44,13 +49,33 @@ The player who owns the attacker sees the dialog, if that player is online. Othe
 
 If the excess would be enough for more minions than are in range, the dialog says so and offers the ones that are.
 
+<figure markdown="span">
+  ![The overkill dialog with three minions checked](../assets/images/overkill-dialog.png){ width="400" loading=lazy }
+  <figcaption>The dialog: three minions checked, which is the most this damage allows.</figcaption>
+</figure>
+
+<figure markdown="span">
+  ![Red rings around the proposed minions on the map](../assets/images/overkill-map.png){ width="340" loading=lazy }
+  <figcaption>The same choice on the map: red rings mark the checked minions.</figcaption>
+</figure>
+
 ### While a player decides
 
-The GM sees a waiting window: **Waiting for the player to resolve the overkill.** It has two buttons: **Decide for them** opens the dialog for the GM, and **Cancel overkill** ends it. The first answer wins.
+The GM sees a waiting window: **Waiting for *player* to resolve *character*'s overkill.** It has two buttons: **Decide for them** opens the dialog for the GM, and **Cancel overkill** ends it. The first answer wins.
+
+<figure markdown="span">
+  ![The GM waiting window with Decide for them and Cancel overkill](../assets/images/gm-waiting.png){ width="360" loading=lazy }
+  <figcaption>What the GM sees while the player decides.</figcaption>
+</figure>
 
 ## Opportunity attacks
 
 Opportunity attacks cause no overkill. When an attack happens outside the attacker's turn, or outside combat, the dialog starts by asking **Was this an opportunity attack?** The default answer is **No**. Answer **Yes (no overkill)** and the minion list closes at once: the boxes go grey and the rings disappear. Answer **No** and the list comes back.
+
+<figure markdown="span">
+  ![The overkill dialog with the opportunity attack question](../assets/images/opportunity-question.png){ width="400" loading=lazy }
+  <figcaption>The question appears when the attack is outside the attacker's turn.</figcaption>
+</figure>
 
 ## In the chat
 
@@ -62,6 +87,11 @@ When it doesn't happen, the chat says so, so the table knows it was a decision a
 - the player pressed **Confirm** with no minion checked.
 
 An opportunity attack leaves no message.
+
+<figure markdown="span">
+  ![The chat message announcing an overkill](../assets/images/overkill-chat.png){ width="300" loading=lazy }
+  <figcaption>The message in the chat.</figcaption>
+</figure>
 
 ## Who killed whom
 

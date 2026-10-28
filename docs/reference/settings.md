@@ -2,6 +2,11 @@
 
 Open **Configure Settings → Minion!**.
 
+<figure markdown="span">
+  ![The Minion! section of Configure Settings](../assets/images/settings.png){ width="560" loading=lazy }
+  <figcaption>The module settings. This world has the group initiative set to the average, not to the default.</figcaption>
+</figure>
+
 | Setting | Scope | Default | What it does |
 |---|---|---|---|
 | **Preselect the proposed minions** | world | on | The [overkill dialog](../table/overkill.md#the-overkill-dialog) opens with the nearest minions checked. When off, nothing is checked and the player picks the minions. The limit on how many can be checked stays. |

@@ -13,3 +13,8 @@ A band that has already rolled shows *"This band has already rolled initiative: 
 A band made by [automatic groups](setup.md#automatic-groups) shows **No captain**. Give it a color and a captain here, before the roll.
 
 Click **Apply** to save. Minion! tells you how many bands were updated.
+
+<figure markdown="span">
+  ![The Existing bands tab with two bands](../assets/images/existing-bands.png){ width="640" loading=lazy }
+  <figcaption>The lock marks a band that has already rolled initiative: its mode and captain can no longer change.</figcaption>
+</figure>

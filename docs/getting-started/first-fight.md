@@ -14,6 +14,11 @@ Attack one minion with a weapon. If the attack hits, the minion drops to 0 hit p
 
 ## An overkill
 
+<figure markdown="span">
+  ![A weapon attack drops a minion and the overkill dialog takes down more](../assets/images/overkill.gif){ width="520" loading=lazy }
+  <figcaption>What you are about to see: the attack, the dialog and the fall.</figcaption>
+</figure>
+
 Attack a minion again with a damage roll above its hit point maximum. For a minion with 6 hit points, an attack dealing 20 damage leaves an excess of 14: enough for three more minions, since each one takes 6 and a fraction counts as a full one.
 
 1. The attacking player sees the overkill dialog. The nearest minions in range are already checked, and their tokens show a red ring on that player's screen only.
