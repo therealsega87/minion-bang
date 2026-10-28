@@ -4,7 +4,7 @@ The table holds the **largest band** allowed for each challenge rating. A band n
 
 ## Where the defaults come from
 
-The default values are the **Minions per Standard** column of the *Minion Encounter Building* table in *Flee, Mortals!*. The book uses that column to plan encounters: it says to think of that many minions as one standard creature. The book does not use it to cap bands. Minion! borrows it as a sensible default size for a band, and that choice is Minion!'s own.
+The default values are the **Minions per Standard** column of the *Minion Encounter Building* table in *Flee, Mortals!*. The settings window calls it "the table of the rules". The book uses the column to plan encounters: that many minions count as one standard creature. It does not limit a band, and bands are optional there. Minion! takes the column as the default size of a band.
 
 | Challenge rating | Maximum band size |
 |---|---|
@@ -29,7 +29,7 @@ Values from *Flee, Mortals!* by MCDM Productions. See the book for the full tabl
 Every maximum must be a whole number of at least 2, or the table is not saved. A creature above CR 21 uses the last row.
 
 !!! warning "Balance"
-    The window warns you: changing these values from the default table changes the balance of your encounters. The table applies to the whole world.
+    The window warns you: changing these values from the table of the rules changes the balance of your encounters. The table applies to the whole world.
 
 If the stored table is damaged, Minion! uses the default and tells the GM. Open the table from the settings to fix it.
 
