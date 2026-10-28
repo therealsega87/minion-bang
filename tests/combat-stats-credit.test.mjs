@@ -21,7 +21,6 @@ function makeTracker(label) {
 }
 
 const stats = makeTracker("cs");
-const deeper = makeTracker("deeper");
 const pc = { id: "a1", name: "Akra", type: "character" };
 const tokens = { "Scene.S.Token.T1": { actor: pc } };
 let randomCounter = 0;
@@ -61,14 +60,12 @@ const check = (label, actual, expected) => {
 };
 const reset = () => {
   order.length = 0; store.clear(); randomCounter = 0; failWrite = false;
-  modes = { "combat-stats": "midi-manual", "deeper-combat-stats": "midi-manual" };
+  modes = { "combat-stats": "midi-manual" };
   active = new Set(["combat-stats"]);
   game.user.isGM = true;
   game.combatStats = stats;
   delete stats._mode;
-  delete game.deeperCombatStats;
   store.set("combat-stats", fight());
-  store.set("deeper-combat-stats", fight());
 };
 const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, async () => { order.push(["update"]); });
 
@@ -169,24 +166,9 @@ const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, async (
   check("Combat Stats with other internals: nothing is credited, a warning is logged", [order.map(o => o[0]), getRecentLogs().some(l => l.level === "warn" && l.text.includes("not the ones expected"))], [["update"], true]);
 }
 {
-  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.deeperCombatStats = deeper;
+  reset(); active = new Set(["other-stats"]); delete game.combatStats; game.combatStats = makeTracker("other");
   await run();
-  check("Deeper Combat Stats alone: the kill goes there", order.map(o => o[0]), ["update", "deeper-kill", "deeper-combat-stats-save"]);
-  reset(); active = new Set(["combat-stats", "deeper-combat-stats"]); game.deeperCombatStats = deeper;
-  await run();
-  check("both modules active: each one counts the kill once", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save", "deeper-kill", "deeper-combat-stats-save"]);
-  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.combatStats = deeper;
-  await run();
-  check("Deeper Combat Stats exposed as game.combatStats is found too", order.map(o => o[0]), ["update", "deeper-kill", "deeper-combat-stats-save"]);
-  reset(); active = new Set(["combat-stats", "deeper-combat-stats"]); game.deeperCombatStats = stats;
-  await run();
-  check("the same tracker seen from two modules counts the kill once", order.filter(o => o[0] === "cs-kill").length, 1);
-  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats; game.deeperCombatStats = deeper; modes["deeper-combat-stats"] = "missing";
-  await run();
-  check("Deeper Combat Stats without the mode setting: nothing, no error", order.map(o => o[0]), ["update"]);
-  reset(); active = new Set(["deeper-combat-stats"]); delete game.combatStats;
-  await run();
-  check("Deeper Combat Stats active but no tracker found: only the update", order.map(o => o[0]), ["update"]);
+  check("only Combat Stats is supported: another active module gets nothing", order.map(o => o[0]), ["update"]);
 }
 
 console.log(`\n${total - failed} passed, ${failed} failed, ${total} total.\n`);

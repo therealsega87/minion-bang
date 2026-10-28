@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.4
+
+- The minions downed by an overkill are passed as kills to Combat Stats only.
+
 ## 1.5.3
 
 - Foundry VTT 13 is supported again, alongside 14. On Foundry 13 Minion! needs Midi-QOL 13.0.64 or later.
@@ -11,7 +15,7 @@
 
 ## 1.5.1
 
-- Fix: overkill kills are credited again to the second statistics module supported by Minion! (wrong module id in 1.5.0).
+- Fix: wrong module id in the statistics support added in 1.5.0.
 
 ## 1.5.0
 
