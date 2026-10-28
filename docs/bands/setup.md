@@ -37,7 +37,7 @@ Use this when you want the bands, their names, their colors and their captains t
 | **Captain** | The member whose roll counts for the band. |
 | Member grid | Under the bands, each minion has one box per band and one for **Alone**. Check a box to move the minion there. |
 
-Each band row shows how many members it has against how many it needs, for example *5 / 5*. The sizes are fixed by the rules: bands of the maximum size, a remainder of two or more as a band, and a remainder of one alone. When a band has the wrong number of members, the window says *"Band 2: it needs 5 members, it has 4."* and *"Fix the errors to be able to apply."*
+Each band row shows how many members it has against how many it needs, for example *5 / 5*. The sizes follow the [band size table](../reference/band-size.md): bands of the maximum size, a remainder of two or more as a band, and a remainder of one alone. When a band has the wrong number of members, the window says *"Band 2: it needs 5 members, it has 4."* and *"Fix the errors to be able to apply."*
 
 !!! note "Bands of any size"
     Free band sizes and an **Add band** button are planned for a later version. See the [roadmap](../project/roadmap.md).

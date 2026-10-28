@@ -14,7 +14,7 @@ Attack one minion with a weapon. If the attack hits, the minion drops to 0 hit p
 
 ## An overkill
 
-Attack a minion again with a damage roll above its hit point maximum. For a minion with 6 hit points, an attack dealing 19 damage leaves an excess of 13: enough for three more minions, since each one takes 6 and a fraction counts as a full one.
+Attack a minion again with a damage roll above its hit point maximum. For a minion with 6 hit points, an attack dealing 20 damage leaves an excess of 14: enough for three more minions, since each one takes 6 and a fraction counts as a full one.
 
 1. The attacking player sees the overkill dialog. The nearest minions in range are already checked, and their tokens show a red ring on that player's screen only.
 2. The dialog never lets you check more minions than the damage allows.

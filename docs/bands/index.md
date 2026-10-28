@@ -2,7 +2,7 @@
 
 Thirty goblins don't need thirty turns. With this feature, minions of the same kind share an initiative and a turn, split into **bands**. A band takes one place in the initiative order, and when its turn comes the module steps through each member and then moves on.
 
-The feature is optional and **off by default**. It follows the *Shared Turns* and *Minion Bands* rules of *Flee, Mortals!*, plus a few table choices of its own that this section points out.
+The feature is optional and **off by default**. In *Flee, Mortals!* minions of the same stat block act on the same turn, and the GM may divide them into bands that act on different initiative counts. Minion! automates both. How large a band can be is Minion!'s own choice: see the [band size table](../reference/band-size.md).
 
 ## How it fits together
 

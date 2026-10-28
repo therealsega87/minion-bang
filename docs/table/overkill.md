@@ -1,6 +1,6 @@
 # Overkill
 
-When a player character's weapon attack deals more damage than a minion has hit points, the excess takes down more minions of the same kind. Akra swings at a goblin with 6 hit points and deals 19 damage. The goblin dies, and the 13 extra points are enough for three more goblins in reach.
+When a player character's weapon attack deals more damage than a minion has hit points, the excess takes down more minions of the same kind. Akra swings at a goblin with 6 hit points and deals 20 damage. The goblin dies, and the 14 extra points are enough for three more goblins in reach.
 
 ## When overkill happens
 
@@ -20,7 +20,7 @@ One more minion for each full or partial hit point maximum of excess. The excess
 
 | Damage | Minion's maximum | Excess | Extra minions |
 |---|---|---|---|
-| 19 | 6 | 13 | 3 |
+| 20 | 6 | 14 | 3 |
 | 14 | 6 | 8 | 2 |
 | 7 | 6 | 1 | 1 |
 

@@ -10,7 +10,7 @@ Plans change with what players ask for. There are no dates.
 
 ## Version 2.0
 
-- **Bands of any size.** An **Add band** button in the Groups and bands window, bands of any size, and a warning when a size goes against the rules' balance.
+- **Bands of any size.** An **Add band** button in the Groups and bands window, bands of any size, and a warning when a size goes against the band size table.
 - **Bands that merge.** At the start of a round, bands that lost members can merge into one that acts with the lowest initiative of the bands.
 
 ## Later
