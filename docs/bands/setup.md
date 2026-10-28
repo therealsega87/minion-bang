@@ -1,30 +1,30 @@
 # Setting up bands
 
-You need **Shared turns and bands** turned on in the [settings](../reference/settings.md), and minions on the scene that are not in the combat yet.
+Turn on **Shared turns and bands** in the [settings](../reference/settings.md) first. Then use automatic groups, the Groups and bands window, or both.
 
 ## Automatic groups
 
-If you add minions to a combat and roll initiative without opening any window, Minion! groups them for you.
+Add minions to a combat and roll initiative as usual, without opening any window. Minion! groups the minions for you, as long as nobody in that combat has rolled initiative yet.
 
-- Minions of the same kind that join **before** the roll are grouped in blocks of the maximum band size for their challenge rating. Seven goblins with a maximum of 5 become 5 + 2.
-- A single minion left over stays alone. It joins the next minion of its kind that you add.
-- Minions with no challenge rating are never grouped.
-- Groups you made by hand are left alone.
-- After the roll, nothing changes.
+- Minions of the same kind are grouped in blocks of the maximum band size for their challenge rating. Seven goblins with a maximum of 5 become 5 + 2.
+- A new minion first fills a group of its kind that still has room. A group with minions of more than one kind is never touched.
+- A single minion left over stays alone, and joins the next minion of its kind that you add.
+- Minions with no challenge rating are never grouped, and neither are minions the Groups and bands window added alone.
+- Once anyone in the combat has an initiative value, even a player character, nothing more is grouped automatically.
 
-Automatic groups have no color and no captain. Give them one from the [Existing bands](existing.md) tab, or the captain's roll mode has nobody to roll.
+An automatic group is named after the minion, and has no color and no captain. Give it both in the [Existing bands](existing.md) tab before the roll. Without a captain, the captain's roll mode can't set the group's initiative.
 
 ## The Groups and bands window
 
-Use this when you want the bands, their names, their colors and their captains to be your choice.
+Use the window when you want to choose the bands, their names, their colors and their captains yourself. It also works in the middle of a fight, to bring in a new horde.
 
-1. Place the minions on the scene. To use only some of them, select them first.
-2. Click **Groups and bands** in the header of the combat tracker. It is GM only.
-3. If tokens are selected, the window asks **Do you want to use only the selected monsters?** Answer **Yes, only the selected ones** or **No, all the ones in the scene**.
-4. The window shows one tab per kind of minion. Minions already in the combat, and minions without a challenge rating, are not listed.
-5. Each tab starts with a header: how many minions there are, their challenge rating and the maximum per band. Below it, the plan: the bands proposed and how many minions stay alone.
+1. Place the minions on the scene. To use only some of them, select those tokens.
+2. Click **Groups and bands** in the combat tracker. Only the GM sees the button, and only while **Shared turns and bands** is on.
+3. If any minions are selected, the window asks **Do you want to use only the selected monsters?** Answer **Yes, only the selected ones** or **No, all the ones in the scene**.
+4. The window has one tab per kind of minion. Minions already in the combat, and minions with no challenge rating, aren't listed.
+5. Each tab starts with a summary, for example *"9 minions · CR 1/4 · maximum 5 per band"*, and the proposed split, for example *"Bands: 5 + 4."*
 6. Adjust the bands. See below.
-7. Click **Apply**. A confirmation lists the kinds and the number of bands and singles. Confirm, and Minion! adds everything to the combat, creating one if there is none. **Apply never rolls initiative.**
+7. Click **Apply**. If you set up more than one kind of minion, a confirmation lists the bands and the minions left alone for each kind. Minion! then adds everyone to the combat, and creates the combat if there isn't one. **Apply never rolls initiative.**
 8. Roll initiative as usual.
 
 <figure markdown="span">
@@ -34,7 +34,7 @@ Use this when you want the bands, their names, their colors and their captains t
 
 <figure markdown="span">
   ![The Groups and bands window with two bands of Goblin Lackeys](../assets/images/bands-window.png){ width="640" loading=lazy }
-  <figcaption>Nine goblin lackeys, a maximum of 5: the window proposes two bands, 5 and 4.</figcaption>
+  <figcaption>Nine goblin lackeys with a maximum of 5: the window proposes a band of 5 and a band of 4.</figcaption>
 </figure>
 
 ### What you can change
@@ -42,25 +42,25 @@ Use this when you want the bands, their names, their colors and their captains t
 | Control | What it does |
 |---|---|
 | **Name** | The band's name in the tracker. It can't be empty. |
-| **Color** | The band's color on the map. New bands get colors no other band in the combat uses. |
-| **Initiative** | How the band's initiative is decided. The default is the world [setting](../reference/settings.md). See [Initiative and captains](initiative.md). |
-| **Captain** | The member whose roll counts for the band. |
-| Member grid | Under the bands, each minion has one box per band and one for **Alone**. Check a box to move the minion there. |
+| **Color** | The band's color on the map. New bands get colors no other band is using. |
+| **Initiative** | How the band's initiative is decided. **Settings** follows the world [setting](../reference/settings.md). See [Initiative and captains](initiative.md). |
+| **Captain** | The member whose roll counts for the band. It starts as the first member. |
+| Member grid | Each minion has one button per band and one for **Alone**. Click one to move the minion there. |
 
-Each band row shows how many members it has against how many it needs, for example *5 / 5*. The sizes follow the [band size table](../reference/band-size.md): bands of the maximum size, a remainder of two or more as a band, and a remainder of one alone. When a band has the wrong number of members, the window says *"Band 2: it needs 5 members, it has 4."* and *"Fix the errors to be able to apply."*
+Band sizes follow the [band size table](../reference/band-size.md): full bands of the maximum size, then whatever is left as a smaller band, and a single minion left alone. You can move minions around, but each band must keep its size. Each band row shows its count, for example *5 / 5*. When a count is wrong, the window says *"Band 2: it needs 5 members, it has 4."* and *"Fix the errors to be able to apply."*
 
 !!! note "Bands of any size"
-    Free band sizes and an **Add band** button are planned for a later version. See the [roadmap](../project/roadmap.md).
+    Free band sizes and an **Add band** button are on the [roadmap](../project/roadmap.md).
 
 ### The preview on the map
 
-While the window is open, rings in each band's color mark its members on the scene. Hover over a band's row and its rings get thicker. A minion that stays alone gets a thin grey ring.
+While the window is open, a ring in each band's color marks its members on the scene, and a thin grey ring marks each minion staying alone. Point at a minion's row in the window and its ring gets thicker.
 
 <figure markdown="span">
   ![Rings in each band's color around the minions on the map](../assets/images/bands-preview.png){ width="440" loading=lazy }
-  <figcaption>Rings in each band's color mark the members while the window is open.</figcaption>
+  <figcaption>While the window is open, rings in each band's color mark its members.</figcaption>
 </figure>
 
-### If creatures changed under you
+### If tokens change while the window is open
 
-If a token disappears while the window is open, Minion! says which one is no longer available. Close the window and open it again.
+If a token is deleted, or added to the combat some other way, the window names it and blocks **Apply**. Close the window and open it again.

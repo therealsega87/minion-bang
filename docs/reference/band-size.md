@@ -1,10 +1,10 @@
 # Band size table
 
-The table holds the **largest band** allowed for each challenge rating. A band never has more members than its row says.
+The table sets the **largest band** for each challenge rating. No band has more members than its row allows.
 
 ## Where the defaults come from
 
-The default values are the **Minions per Standard** column of the *Minion Encounter Building* table in *Flee, Mortals!*. The settings window calls it "the table of the rules". The book uses the column to plan encounters: that many minions count as one standard creature. It does not limit a band, and bands are optional there. Minion! takes the column as the default size of a band.
+The defaults are the **Minions per Standard** column of the *Minion Encounter Building* table in *Flee, Mortals!*. The settings window calls it "the table of the rules". In the book, the column is for building encounters: that many minions count as one standard creature. The book doesn't limit band size, and its bands are optional. Minion! uses the column as the default band size.
 
 | Challenge rating | Maximum band size |
 |---|---|
@@ -12,26 +12,26 @@ The default values are the **Minions per Standard** column of the *Minion Encoun
 | 5 to 8 | 8 |
 | 9 and above | 10 |
 
-Values from *Flee, Mortals!* by MCDM Productions. See the book for the full table.
+Values from *Flee, Mortals!* by MCDM Productions. The book has the full table.
 
 ## Editing the table
 
 1. Open **Configure Settings → Minion!**.
-2. Next to **Maximum band size**, click **Edit the table**. It is GM only.
+2. Next to **Maximum band size**, click **Edit the table**. Only the GM can.
 3. Change the **Maximum** of any row. The **Default** column shows the original value.
-4. Click **Save**. **Restore default** puts the whole table back.
+4. Click **Save**. **Restore default** resets the whole table.
 
 <figure markdown="span">
   ![The Maximum band size window with one row per challenge rating](../assets/images/band-size-table.png){ width="300" loading=lazy }
-  <figcaption>The table window. <strong>Default</strong> shows the original value of each row.</figcaption>
+  <figcaption>The table window. <strong>Default</strong> shows each row's original value.</figcaption>
 </figure>
 
-Every maximum must be a whole number of at least 2, or the table is not saved. A creature above CR 21 uses the last row.
+Every maximum must be a whole number of 2 or more, or the table isn't saved. A creature above CR 21 uses the last row.
 
 !!! warning "Balance"
-    The window warns you: changing these values from the table of the rules changes the balance of your encounters. The table applies to the whole world.
+    As the window warns, moving away from the table of the rules affects the balance of your encounters. The table applies to the whole world.
 
-If the stored table is damaged, Minion! uses the default and tells the GM. Open the table from the settings to fix it.
+If the saved table gets corrupted, Minion! falls back to the default and tells the GM. Open the table from the settings to fix it.
 
 ## Where the table is used
 

@@ -1,6 +1,6 @@
 # Initiative and captains
 
-A band rolls once, not once per member.
+A band gets one initiative for all its members.
 
 ## The modes
 
@@ -10,25 +10,27 @@ A band rolls once, not once per member.
 | **Average** | Every member | The average, rounded up |
 | **Highest** | Every member | The highest roll |
 | **Lowest** | Every member | The lowest roll |
-| **Median** | Every member | The median |
+| **Median** | Every member | The median, rounded up |
 
-The world default is the setting **Initiative of the groups**. Each band can override it in the [Groups and bands window](setup.md#what-you-can-change) or, until it rolls, in the [Existing bands](existing.md) tab.
+The setting **Initiative of the groups** sets the mode for the whole world. Each band can use a different one, chosen in the [Groups and bands window](setup.md#what-you-can-change) or, until the band rolls, in the [Existing bands](existing.md) tab.
 
-In the captain mode, when someone rolls for the band, Minion! uses the captain's roll. In the other modes, the chat gets one roll card per member plus a summary card for the GM.
+**Captain's roll.** When the GM rolls initiative for any member of the band, Minion! rolls for the captain instead, and the band takes that result.
 
-## The value stays fixed
+**The other modes.** When one member rolls, Minion! rolls for the members that haven't, then calculates the band's initiative. The chat gets one roll card per member, plus a summary card whispered to the GM.
 
-Once a band has its initiative, later rolls by other members don't change it. **Reset Initiative** clears the bands too.
+## The initiative stays put
+
+In the captain's roll mode, once the band has its initiative, later rolls by other members don't change it. **Reset Initiative** clears the bands' initiative too.
 
 ## The captain
 
-The captain is the member whose roll stands for the band. In the Groups and bands window you pick one for each band. If a band has no captain, a note says so, and nobody rolls in the captain mode.
+The captain is the member whose roll stands for the band. The Groups and bands window gives each band one, the first member unless you pick another. Automatic groups have no captain until you give them one in the [Existing bands](existing.md) tab.
 
-If the captain falls or leaves the combat, the first member still standing takes over. The band keeps its initiative, with no new roll.
+If the captain drops or leaves the combat, the first member still standing becomes captain. The band keeps its initiative and nobody rolls again.
 
 ## Known quirks
 
-- In the captain mode, if the captain can't roll, nobody rolls and no warning appears.
-- When a member rolls, the band can show the value copied by dnd5e for a fraction of a second before Minion! sets the right one.
+- In the captain's roll mode, if the captain can't roll, nobody rolls and no warning appears.
+- When a member rolls, the band can show the value dnd5e copied for a split second, before Minion! sets the right one.
 
 More in [Known limitations](../help/limitations.md).

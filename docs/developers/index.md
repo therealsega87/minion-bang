@@ -1,6 +1,6 @@
 # For developers
 
-Minion! exposes three things to other modules and macros:
+Minion! offers three things to other modules and macros:
 
 | What | Where |
 |---|---|
@@ -8,10 +8,10 @@ Minion! exposes three things to other modules and macros:
 | `api.isMinion(actor)` and the schema version | [API and flags](api-and-flags.md) |
 | Flags on actors, groups, combatants and tokens | [API and flags](api-and-flags.md#flags) |
 
-If you write a statistics module, read [Statistics modules](statistics-modules.md) as well: it explains how to avoid counting a kill twice.
+If you write a statistics module, also read [Statistics modules](statistics-modules.md). It explains how to avoid counting a kill twice.
 
-The hook reports kills, not damage. If you want to compute damage, use the Midi-QOL hooks.
+The hook reports deaths only. For damage, use the Midi-QOL hooks.
 
-## Stability
+## Versioning
 
-The event carries a version number (`schemaVersion`, now `1`), and `api.minionKillSchemaVersion` gives the same number. Check it before you read the event. The format of `flags.minion-bang.killedBy` does not change.
+Each event carries a version number, `schemaVersion`, currently `1`. `api.minionKillSchemaVersion` holds the same number. Check it before you read the event. The format of `flags.minion-bang.killedBy` stays the same.

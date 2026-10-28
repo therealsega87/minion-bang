@@ -1,20 +1,20 @@
 # Bands already in combat
 
-The **Existing bands** tab of the Groups and bands window lists the bands that are already in the combat.
+When the current combat has bands, the Groups and bands window adds an **Existing bands** tab that lists them.
 
-| What | Until when |
+| What | You can change it |
 |---|---|
-| **Color** | Always |
+| **Color** | At any time |
 | **Initiative** mode | Until the band rolls initiative |
 | **Captain** | Until the band rolls initiative |
 
-A band that has already rolled shows *"This band has already rolled initiative: the mode and the captain can no longer be changed."*
+A padlock marks a band that has already rolled. Its tooltip reads *"This band has already rolled initiative: the mode and the captain can no longer be changed."*
 
-A band made by [automatic groups](setup.md#automatic-groups) shows **No captain**. Give it a color and a captain here, before the roll.
+An [automatic group](setup.md#automatic-groups) shows **No captain**. Give it a color and a captain here before the roll.
 
-Click **Apply** to save. Minion! tells you how many bands were updated.
+Point at a band's row and its members' rings get thicker on the map. Click **Apply** to save. Minion! tells you how many bands it updated.
 
 <figure markdown="span">
   ![The Existing bands tab with two bands](../assets/images/existing-bands.png){ width="640" loading=lazy }
-  <figcaption>The lock marks a band that has already rolled initiative: its mode and captain can no longer change.</figcaption>
+  <figcaption>The padlock marks a band that has already rolled. Its mode and captain are fixed.</figcaption>
 </figure>

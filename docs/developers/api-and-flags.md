@@ -2,7 +2,7 @@
 
 ## API
 
-`isMinion` and `minionKillSchemaVersion` are available on every client from the `init` hook. `openBandsWindow` is added at `ready` and only for the GM.
+`isMinion` and `minionKillSchemaVersion` are available on every client from the `init` hook. `openBandsWindow` is added at `ready`, for the GM only.
 
 ```js
 const api = game.modules.get("minion-bang").api;
@@ -14,7 +14,7 @@ const api = game.modules.get("minion-bang").api;
 api.isMinion(actor);
 ```
 
-Returns `true` for minions of *Flee, Mortals!* and for actors marked in Minion!. Use it to tell minions from other creatures, for example to leave them out of your normal kill count.
+Returns `true` for minions from *Flee, Mortals!* and for actors marked in Minion!. Use it to tell minions apart from other creatures, for example to keep them out of your regular kill count.
 
 ### minionKillSchemaVersion
 
@@ -30,7 +30,7 @@ The version of the [`minionKill` event](minion-kill-hook.md#the-event).
 api.openBandsWindow();
 ```
 
-Opens the Groups and bands window. GM only, with [shared turns and bands](../bands/index.md) on.
+Opens the Groups and bands window. GM only, and only while [shared turns and bands](../bands/index.md) is on.
 
 ## Flags
 
@@ -40,11 +40,11 @@ Opens the Groups and bands window. GM only, with [shared turns and bands](../ban
 await actor.setFlag("dnd5e", "minionBangMinion", true);
 ```
 
-The name of this flag will not change.
+This flag's name won't change.
 
 ### Who killed a minion {#who-killed-a-minion}
 
-Every minion that drops, from a hit or from an overkill, gets this record:
+Every minion that Minion! drops, from a hit or from an overkill, gets this record:
 
 ```js
 const record = actor.getFlag("minion-bang", "killedBy");
@@ -57,7 +57,7 @@ const record = actor.getFlag("minion-bang", "killedBy");
 // }
 ```
 
-Each death also gets its own id, the same as the `eventId` of the [hook](minion-kill-hook.md):
+Each death also gets its own id, the same as the hook's `eventId`:
 
 ```js
 actor.getFlag("minion-bang", "deathId");
@@ -65,16 +65,16 @@ actor.getFlag("minion-bang", "deathId");
 
 ### Bands {#band-flags}
 
-The data of a band lives on its combat group, under the `minion-bang` scope.
+A band's data lives on its combatant group, in the `minion-bang` scope.
 
 | Flag | On | Content |
 |---|---|---|
 | `color` | group | The band's color, `#rrggbb` |
-| `captain` | group | The token id of the captain |
-| `mode` | group | `captain`, `average`, `highest`, `lowest` or `median`. Missing means "as in the settings". |
-| `lockedInitiative` | group | The captain's roll, locked |
-| `alone` | combatant | `true` for a creature added alone by the Groups and bands window |
-| `ringOriginal` | token | The original ring color, saved while the token wears a band color |
+| `captain` | group | The captain's token id |
+| `mode` | group | `captain`, `average`, `highest`, `lowest` or `median`. Missing means the world setting. |
+| `lockedInitiative` | group | The captain's roll, locked in |
+| `alone` | combatant | `true` for a minion the Groups and bands window added alone |
+| `ringOriginal` | token | `{ value }`: the ring color the token had before it took a band color |
 
 ```js
 const group = game.combat.groups.getName("Goblin Lackey 1");

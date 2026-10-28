@@ -9,17 +9,17 @@
 | [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 |
 | [socketlib](https://foundryvtt.com/packages/socketlib) | any version for your Foundry |
 
-Midi-QOL needs DAE and libWrapper, so Foundry installs those too.
+Midi-QOL depends on DAE and libWrapper. Foundry offers to install them along with it.
 
 ## Works with
 
-| Module | What changes |
+| Module | What it adds |
 |---|---|
 | *Flee, Mortals!* (MCDM module) | Its minions are recognized with no setup. |
 | Combat Stats | Overkill kills are credited. See [Combat Stats](combat-stats.md). Tested with 4.3.0. |
-| Dynamic Token Ring (a Foundry core feature) | Band colors use the token ring. Without it, a circle is drawn. |
+| Dynamic Token Ring (built into Foundry) | Band colors show on the token ring. Without it, Minion! draws a circle. |
 
-## Does not work with
+## Doesn't work with
 
 | Module | What happens |
 |---|---|
@@ -27,10 +27,10 @@ Midi-QOL needs DAE and libWrapper, so Foundry installs those too.
 
 ## Not supported
 
-- Overkill without Midi-QOL.
-- dnd5e 6 and later. Minion! will be updated when those versions and the modules it depends on are out.
-- Scenes measured in meters: untested.
+- Overkill or the Minion trait without Midi-QOL.
+- dnd5e 5.4 and later. Minion! will follow once those versions, and the modules it depends on, are out and tested.
+- Scenes measured in meters haven't been tested.
 
 ## After you update another module
 
-Minion! reads internal values of Midi-QOL, dnd5e and Combat Stats. A new version can change them. After updating any of those, play a short test fight before the session. See [Updating](../getting-started/updating.md#before-a-session).
+Minion! reads internal values of Midi-QOL, dnd5e and Combat Stats, and a new version can change them. After updating any of them, run a short test fight before the session. See [Updating](../getting-started/updating.md#before-a-session).

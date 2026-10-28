@@ -9,9 +9,9 @@
 | [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 |
 | [socketlib](https://foundryvtt.com/packages/socketlib) | any version for your Foundry |
 
-Midi-QOL needs DAE and libWrapper. Foundry offers to install them together with Midi-QOL.
+Midi-QOL depends on DAE and libWrapper. Foundry offers to install them along with it.
 
-Minion! reads the damage that Midi-QOL calculates, so Midi-QOL is not optional. See [Compatibility](../reference/compatibility.md) for the other modules it works with.
+Minion! reads the damage Midi-QOL calculates, so Midi-QOL is required. [Compatibility](../reference/compatibility.md) covers the other modules.
 
 ## Install
 
@@ -31,7 +31,7 @@ Minion! reads the damage that Midi-QOL calculates, so Midi-QOL is not optional. 
 - **Combat Stats**: the minions downed by an overkill count as kills for the character who made it. See [Combat Stats](../reference/combat-stats.md).
 
 !!! warning "Squad Combat Initiative"
-    Squad Combat Initiative manages the same combatant groups that Minion! uses for [shared turns and bands](../bands/index.md). Turn it off before you turn those on. While both are active, Minion! keeps its groups off and shows the GM a warning. The Minion trait and overkill are not affected.
+    Squad Combat Initiative manages the same combatant groups that Minion! uses for [shared turns and bands](../bands/index.md), so the two can't run together. Turn it off before you turn bands on. While both are active, Minion! keeps its groups off and warns the GM. The Minion trait and overkill work either way.
 
 ## Next
 

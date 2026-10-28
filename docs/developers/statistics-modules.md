@@ -1,29 +1,29 @@
 # Statistics modules
 
-A module that counts kills has to count the minions that overkill takes down, and not count them twice.
+A module that counts kills has to count the minions an overkill takes down, and count each of them once.
 
 ## The problem
 
-The extra minions of an [overkill](../table/overkill.md) drop outside the damage report that Midi-QOL gives. A statistics module that reads only Midi-QOL doesn't see them.
+The extra minions of an [overkill](../table/overkill.md) drop outside the damage report Midi-QOL produces. A statistics module that only reads Midi-QOL misses them.
 
-## The two ways
+## Two ways to handle it
 
-**Read the hook.** Listen to [`minion-bang.minionKill`](minion-kill-hook.md). It reports every minion that dies, with its attacker and cause, including the minions of an overkill.
+**Read the hook.** Listen to [`minion-bang.minionKill`](minion-kill-hook.md). It reports every minion that dies, overkill included, with its attacker and cause.
 
-**Let Minion! credit them.** Today Minion! credits the overkill kills to Combat Stats directly, through internal functions of that module. See [Combat Stats](../reference/combat-stats.md).
+**Let Minion! credit them.** For now, Minion! credits overkill kills to Combat Stats directly, through internal functions of that module. See [Combat Stats](../reference/combat-stats.md).
 
 ## Telling Minion! you read the hook
 
-A module that reads the hook sets this value on `game.combatStats` (the tracker object that Minion! looks for) while it does:
+While your module reads the hook, set this value on `game.combatStats`, the tracker object Minion! looks for:
 
 ```js
 game.combatStats.minionKillSchemaVersion = 1;
 ```
 
-While the value is a whole number of 1 or more, Minion! stops crediting kills directly. Nothing is counted twice, and you only read the hook.
+While the value is a whole number of 1 or more, Minion! stops crediting kills directly, so nothing is counted twice.
 
-If your module is not Combat Stats, the direct credit does not apply to you. Read the hook.
+The direct credit only exists for Combat Stats. Any other module should read the hook.
 
-## Leaving minions out of the normal count
+## Keeping minions out of the regular count
 
-A minion that dies is also a creature that dropped to 0 hit points. If your module counts those, use [`api.isMinion(actor)`](api-and-flags.md#isminion) to skip them and count minions through the hook alone.
+A minion that dies is also a creature that dropped to 0 hit points. If your module counts those, skip minions with [`api.isMinion(actor)`](api-and-flags.md#isminion) and count them through the hook only.
