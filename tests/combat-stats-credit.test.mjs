@@ -65,6 +65,7 @@ const reset = () => {
   active = new Set(["combat-stats"]);
   game.user.isGM = true;
   game.combatStats = stats;
+  delete stats._mode;
   delete game.deeperCombatStats;
   store.set("combat-stats", fight());
   store.set("deeper-combat-stats", fight());
@@ -90,6 +91,23 @@ const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, async (
   reset(); modes["combat-stats"] = "native";
   await run();
   check("native mode: only the update (Combat Stats counts the kill on its own)", order.map(o => o[0]), ["update"]);
+}
+{
+  reset(); stats._mode = "native";
+  await run();
+  check("set to Midi but still running native (no reload): only the update", order.map(o => o[0]), ["update"]);
+  reset(); modes["combat-stats"] = "native"; stats._mode = "midi-manual";
+  await run();
+  check("set to native but still running Midi (no reload): the kill is credited", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save"]);
+  reset(); modes["combat-stats"] = "missing"; stats._mode = "midi-auto";
+  await run();
+  check("no saved setting, running Midi: the kill is credited", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save"]);
+  reset(); modes["combat-stats"] = "missing";
+  await run();
+  check("no saved setting and no running mode: only the update", order.map(o => o[0]), ["update"]);
+  reset(); stats._mode = 3;
+  await run();
+  check("a running mode that is not text: the saved setting decides", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save"]);
 }
 {
   reset(); store.set("combat-stats", { combatId: null, characters: {} });

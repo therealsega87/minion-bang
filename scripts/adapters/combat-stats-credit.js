@@ -7,6 +7,27 @@ const TRACKERS = Object.freeze([
 ]);
 const CURRENT_KEY = "currentCombatData";
 
+// Combat Stats fixes its mode when the world loads: a change to the setting
+// applies only after a reload. Read the mode it is running with, so the extra
+// kills are not counted twice when the setting was changed without reloading.
+function runningMode(moduleId, stats) {
+  let saved;
+  try {
+    saved = game.settings.get(moduleId, "trackerMode");
+  } catch {
+    saved = undefined;
+  }
+  const running = typeof stats._mode === "string" ? stats._mode : saved;
+  if (running === undefined) {
+    debugLog(`${moduleId} has no "trackerMode" setting: nothing to credit.`);
+    return undefined;
+  }
+  if (saved !== undefined && saved !== running) {
+    debugLog(`${moduleId} is set to "${saved}" but still runs in "${running}" mode until the world is reloaded.`);
+  }
+  return running;
+}
+
 function readTrackers() {
   if (!game.user?.isGM) return [];
   const found = [];
@@ -19,13 +40,7 @@ function readTrackers() {
       continue;
     }
     if (seen.has(stats)) continue;
-    let mode;
-    try {
-      mode = game.settings.get(moduleId, "trackerMode");
-    } catch {
-      debugLog(`${moduleId} has no "trackerMode" setting: nothing to credit.`);
-      continue;
-    }
+    const mode = runningMode(moduleId, stats);
     if (!creditsOverkillKills(mode)) continue;
     if (typeof stats._accKill !== "function") {
       warnLog(`${moduleId} is active but its internals are not the ones expected: the extra kills are not credited.`);

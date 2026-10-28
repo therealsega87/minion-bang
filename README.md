@@ -2,7 +2,7 @@
   <a href="https://github.com/therealsega87/minion-bang/releases"><img alt="Total downloads" src="https://img.shields.io/github/downloads/therealsega87/minion-bang/total?style=flat-square&label=downloads"></a>
   <a href="https://github.com/therealsega87/minion-bang/releases/latest"><img alt="Downloads of the latest version" src="https://img.shields.io/github/downloads/therealsega87/minion-bang/latest/module.zip?style=flat-square&label=latest%20version"></a>
   <a href="https://forge-vtt.com/bazaar"><img alt="Forge installs" src="https://img.shields.io/badge/dynamic/json?label=Forge%20installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fminion-bang&style=flat-square&colorB=4aa94a"></a>
-  <img alt="Foundry VTT 14" src="https://img.shields.io/badge/Foundry%20VTT-14-orange?style=flat-square">
+  <img alt="Foundry VTT 13 and 14" src="https://img.shields.io/badge/Foundry%20VTT-13%20%7C%2014-orange?style=flat-square">
   <a href="https://ko-fi.com/therealsega"><img alt="Support me on Ko-fi" src="https://img.shields.io/badge/Ko--fi-support%20me-FF5E5B?style=flat-square&logo=ko-fi&logoColor=white"></a>
   <a href="https://discord.com/users/688483231531532323"><img alt="Discord: therealsega87" src="https://img.shields.io/badge/Discord-therealsega87-5865F2?style=flat-square&logo=discord&logoColor=white"></a>
 </p>
@@ -41,7 +41,7 @@ It works on top of Midi-QOL. You keep attacking the way you always do.
 
 ### Shared turns and bands (optional)
 
-Minions of the same kind share one initiative and one turn, split into bands of the size the rules give for their challenge rating: up to 5, 8 or 10. The feature uses the combatant groups built into Foundry 14.
+Minions of the same kind share one initiative and one turn, split into bands of the size the rules give for their challenge rating: up to 5, 8 or 10. The feature uses the combatant groups built into Foundry.
 
 - **Automatic groups.** Minions of the same stat block that join a combat before initiative is rolled form groups on their own. A lone minion stays alone.
 - **The "Groups and bands" window.** A button in the header of the combat tracker opens it (GM only). It reads the minions on the scene that aren't in combat yet, one tab per type, and proposes the bands. You can move creatures from one band to another, leave some alone, rename the bands and pick for each band a color, a captain and an initiative mode. **Apply** adds everything to the combat, creating one if needed, without rolling initiative.
@@ -54,16 +54,16 @@ Minions of the same kind share one initiative and one turn, split into bands of 
 
 ### Statistics modules
 
-With **Combat Stats** in one of its Midi-QOL modes, the minions downed by an overkill count as kills for the character who made it.
+With **Combat Stats** in one of its Midi-QOL modes, the minions downed by an overkill count as kills for the character who made it. After changing the Combat Stats mode, reload Foundry (F5), as Combat Stats asks.
 
 ## Requirements
 
 | Package | Version |
 |---|---|
-| Foundry VTT | 14 |
+| Foundry VTT | 13 or 14 |
 | dnd5e | 5.3.2 to 5.3.x |
-| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 14.0.11 or later |
-| [socketlib](https://foundryvtt.com/packages/socketlib) | any version for Foundry 14 |
+| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 |
+| [socketlib](https://foundryvtt.com/packages/socketlib) | any version for your Foundry |
 
 Midi-QOL needs DAE and libWrapper, so Foundry installs those too.
 

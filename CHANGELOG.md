@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.3
+
+- Foundry VTT 13 is supported again, alongside 14. On Foundry 13 Minion! needs Midi-QOL 13.0.64 or later.
+- Fix: with Combat Stats, Minion! follows the mode Combat Stats is running in, not the one saved in its settings. Combat Stats applies a new mode only after a reload: until then, the minions downed by an overkill were counted twice.
+
 ## 1.5.2
 
 - Fix: with Combat Stats, the minions downed by an overkill now count as kills only. They no longer add their hit points to the damage dealt, so the damage dealt matches the roll.
