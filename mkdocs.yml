@@ -1,0 +1,122 @@
+site_name: Minion!
+site_description: Minion rules for D&D 5e in Foundry VTT, on top of Midi-QOL.
+site_author: therealsega87
+site_url: https://therealsega87.github.io/minion-bang/
+repo_url: https://github.com/therealsega87/minion-bang
+repo_name: therealsega87/minion-bang
+edit_uri: edit/docs/docs/
+copyright: Minion! is released under the MIT License. Flee, Mortals! is published by MCDM Productions.
+
+theme:
+  name: material
+  language: en
+  icon:
+    logo: material/skull-crossbones
+    repo: fontawesome/brands/github
+  font:
+    text: Inter
+    code: JetBrains Mono
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.instant
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/therealsega87/minion-bang
+      name: GitHub
+    - icon: simple/kofi
+      link: https://ko-fi.com/therealsega
+      name: Support on Ko-fi
+    - icon: fontawesome/brands/discord
+      link: https://discord.com/users/688483231531532323
+      name: Discord (therealsega87)
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting started:
+      - getting-started/index.md
+      - Installation: getting-started/installation.md
+      - Marking minions: getting-started/marking-minions.md
+      - Your first fight: getting-started/first-fight.md
+      - Updating: getting-started/updating.md
+  - At the table:
+      - table/index.md
+      - The Minion trait: table/minion-trait.md
+      - Overkill: table/overkill.md
+      - Shared turns and bands:
+          - bands/index.md
+          - Setting up bands: bands/setup.md
+          - Initiative and captains: bands/initiative.md
+          - Turns: bands/turns.md
+          - Colors on the map: bands/colors.md
+          - Bands already in combat: bands/existing.md
+      - What happens when: table/edge-cases.md
+  - Reference:
+      - reference/index.md
+      - Settings: reference/settings.md
+      - Band size table: reference/band-size.md
+      - Combat Stats: reference/combat-stats.md
+      - Compatibility: reference/compatibility.md
+  - For developers:
+      - developers/index.md
+      - The minionKill hook: developers/minion-kill-hook.md
+      - API and flags: developers/api-and-flags.md
+      - Statistics modules: developers/statistics-modules.md
+  - Help:
+      - help/index.md
+      - Troubleshooting: help/troubleshooting.md
+      - FAQ: help/faq.md
+      - Known limitations: help/limitations.md
+      - Reporting a bug: help/bug-report.md
+  - Project:
+      - project/index.md
+      - Changelog: project/changelog.md
+      - Roadmap: project/roadmap.md
+      - Support and credits: project/credits.md
