@@ -136,6 +136,47 @@ The interface is in English and Italian. Foundry uses the language of each user.
 - In the average, highest, lowest and median modes every member rolls, so the chat gets one roll card per member plus a summary card for the GM.
 - The Combat Stats support uses internal functions of that module. A future version of Combat Stats may need an update of Minion!.
 
+## For module developers
+
+### Minion kills: `minion-bang.minionKill`
+
+Minion! calls `Hooks.callAll("minion-bang.minionKill", event)` once for each minion that really goes from positive hit points to 0, after the hit points are written. An attack that downs the hit minion and three more by overkill makes four calls. The call happens only on the client of the active GM: when another GM applies the damage, the event is passed to the active GM through socketlib.
+
+```js
+Hooks.on("minion-bang.minionKill", event => {
+  // event.schemaVersion  1
+  // event.eventId        id of this death, also saved on the minion in flags.minion-bang.deathId
+  // event.workflowId     uuid of the attack's chat card, the same for every victim of one attack; null if unknown
+  // event.combatId, event.round, event.turn   null out of combat; turn is Foundry's index and can be 0
+  // event.sceneId
+  // event.attacker       { actorId, actorUuid, tokenUuid, name } or null if unknown
+  // event.victim         { actorId, actorUuid, tokenUuid, name, cr, minionsPerStandard }
+  //                      cr is null when unknown; minionsPerStandard is the maximum band
+  //                      size for that CR in Minion!'s table (5, 8 or 10 by default)
+  // event.itemUuid       the weapon or spell, or null
+  // event.cause          "direct": the minion hit by the attack, spell or effect
+  //                      "overkill": a minion taken down by the overkill
+  //                      "other": hit points set to 0 outside Minion!'s rules (by hand,
+  //                      damage without Midi-QOL data); attacker is null
+});
+```
+
+The event reports a kill, never damage. A minion already at 0 hit points, a token deleted, a reload or a Dead status set by hand make no event. A minion revived and killed again gets a new `eventId`.
+
+### API
+
+```js
+const api = game.modules.get("minion-bang").api;
+api.isMinion(actor);          // true for minions of Flee, Mortals! and minions marked in Minion!
+api.minionKillSchemaVersion;  // 1
+```
+
+Both are available on every client from the `init` hook. The flag `flags.minion-bang.killedBy` keeps its format.
+
+### Statistics modules that read the hook
+
+Minion! credits the overkill kills to Combat Stats directly, because Combat Stats does not read the hook yet. A statistics tracker that reads `minion-bang.minionKill` sets `game.combatStats.minionKillSchemaVersion = 1` while it does; Minion! then stops the direct credit, so no minion is counted twice.
+
 ## Reporting a bug
 
 1. Turn on **Enable Debug**.

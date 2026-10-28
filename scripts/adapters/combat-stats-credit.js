@@ -33,6 +33,10 @@ function readTracker() {
     debugLog(`${MODULE_ID} is active but its tracker was not found (looked for game.combatStats).`);
     return null;
   }
+  if (Number.isInteger(stats.minionKillSchemaVersion) && stats.minionKillSchemaVersion >= 1) {
+    debugLog(`${MODULE_ID} reads the minion kills from the minion-bang.minionKill hook: no direct credit.`);
+    return null;
+  }
   if (!creditsOverkillKills(runningMode(stats))) return null;
   if (typeof stats._accKill !== "function") {
     warnLog(`${MODULE_ID} is active but its internals are not the ones expected: the extra kills are not credited.`);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+
+- New hook for other modules: `minion-bang.minionKill`. Minion! calls it once for each minion that dies, on the active GM's client, with the attacker, the cause (hit, overkill or other), the minion's challenge rating and the fight's round and turn. Each death gets an id saved on the minion in `flags.minion-bang.deathId`.
+- New API: `game.modules.get("minion-bang").api.isMinion(actor)` and `api.minionKillSchemaVersion`, available on every client.
+- When Combat Stats sets `game.combatStats.minionKillSchemaVersion`, Minion! stops crediting the overkill kills directly: Combat Stats reads them from the hook.
+
 ## 1.5.4
 
 - The minions downed by an overkill are passed as kills to Combat Stats only.

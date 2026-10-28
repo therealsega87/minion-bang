@@ -166,6 +166,16 @@ const run = (m = minion(), rec = record) => updateWithKillCredit(m, rec, async (
   check("Combat Stats with other internals: nothing is credited, a warning is logged", [order.map(o => o[0]), getRecentLogs().some(l => l.level === "warn" && l.text.includes("not the ones expected"))], [["update"], true]);
 }
 {
+  reset(); stats.minionKillSchemaVersion = 1;
+  await run();
+  delete stats.minionKillSchemaVersion;
+  check("Combat Stats that reads the minionKill hook: no direct credit", order.map(o => o[0]), ["update"]);
+  reset(); stats.minionKillSchemaVersion = "1";
+  await run();
+  delete stats.minionKillSchemaVersion;
+  check("a signal that is not a whole number is ignored: direct credit as today", order.map(o => o[0]), ["update", "cs-kill", "combat-stats-save"]);
+}
+{
   reset(); active = new Set(["other-stats"]); delete game.combatStats; game.combatStats = makeTracker("other");
   await run();
   check("only Combat Stats is supported: another active module gets nothing", order.map(o => o[0]), ["update"]);

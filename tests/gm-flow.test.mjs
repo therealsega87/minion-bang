@@ -1,13 +1,24 @@
 const handlers = new Map();
+let nextHookId = 1;
 globalThis.Hooks = {
   on(name, fn) {
     if (!handlers.has(name)) handlers.set(name, []);
-    handlers.get(name).push(fn);
+    const id = nextHookId++;
+    handlers.get(name).push({ id, fn });
+    return id;
+  },
+  off(name, id) {
+    handlers.set(name, (handlers.get(name) ?? []).filter(h => h.id !== id));
   },
   call(name, ...args) {
-    for (const fn of handlers.get(name) ?? []) fn(...args);
+    for (const { fn } of [...(handlers.get(name) ?? [])]) fn(...args);
+  },
+  callAll(name, ...args) {
+    for (const { fn } of [...(handlers.get(name) ?? [])]) fn(...args);
   }
 };
+const minionKills = [];
+Hooks.on("minion-bang.minionKill", data => { minionKills.push(data); });
 
 class FakeGraphics {
   constructor() { this.destroyed = false; this.alpha = null; }
@@ -37,7 +48,7 @@ globalThis.CONFIG = { specialStatusEffects: { DEFEATED: "dead", INVISIBLE: "invi
 const chat = [];
 globalThis.ChatMessage = { create: async data => { chat.push(data); } };
 
-const scene = { grid: { units: "ft", distance: 5, size: 100 } };
+const scene = { id: "scene1", grid: { units: "ft", distance: 5, size: 100 } };
 const canvasTokens = [];
 globalThis.canvas = {
   scene,
@@ -59,8 +70,8 @@ globalThis.game = {
     localize: key => key,
     format: (key, data) => `${key} ${JSON.stringify(data)}`
   },
-  user: { id: "gm" },
-  users: { players: [] },
+  user: { id: "gm", isGM: true },
+  users: { players: [], activeGM: { id: "gm" } },
   combat: null
 };
 
@@ -92,8 +103,9 @@ class FakeRadio extends FakeInput {
   }
 }
 
+let ridCounter = 0;
 globalThis.foundry = {
-  utils: { randomID: () => "rid" },
+  utils: { randomID: () => `rid${++ridCounter}`, getProperty: (o, path) => path.split(".").reduce((v, k) => v?.[k], o) },
   applications: {
     handlebars: {
       renderTemplate: async (path, data) => {
@@ -150,6 +162,8 @@ globalThis.foundry = {
 
 const { registerDamageCapture } = await import("../scripts/adapters/damage-capture.js");
 const { applyMinionDamage } = await import("../scripts/adapters/damage-context.js");
+const { registerMinionDeathWatch } = await import("../scripts/adapters/minion-kill-hook.js");
+registerMinionDeathWatch();
 const logModule = await import("../scripts/log.js");
 
 registerDamageCapture();
@@ -168,7 +182,10 @@ function makeToken(id, name, gx, gy, { type = "npc", minion = true } = {}) {
     async update(data) {
       this.updates.push(data);
       this.system.attributes.hp.value = 0;
+      if (data["flags.minion-bang.deathId"]) this.deathId = data["flags.minion-bang.deathId"];
+      Hooks.call("updateActor", this, { system: { attributes: { hp: { value: 0 } } }, flags: { "minion-bang": { deathId: data["flags.minion-bang.deathId"] } } }, {});
     },
+    getFlag(scope, key) { return scope === "minion-bang" && key === "deathId" ? this.deathId : undefined; },
     async toggleStatusEffect() {},
     testUserPermission: () => false
   };
@@ -222,9 +239,10 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   if (tweak) tweak({ attacker, hit, others });
 
   const workflow = {
+    itemCardUuid: "ChatMessage.card1",
     activity: { type: "attack", getActionType: () => "mwak" },
     attackMode: "oneHanded",
-    item: { name: "Longsword", system: { range: { reach: 5, value: null, units: "ft" } } },
+    item: { name: "Longsword", uuid: "Item.longsword", system: { range: { reach: 5, value: null, units: "ft" } } },
     token: attacker,
     actor: attacker.actor,
     targets: [hit]
@@ -237,12 +255,18 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [], options);
 
   const updates = {};
+  minionKills.length = 0;
   applyMinionDamage(hit.actor, -6, updates, options);
+  if (updates["system.attributes.hp.value"] === 0) {
+    hit.actor.system.attributes.hp.value = 0;
+    hit.actor.deathId = updates["flags.minion-bang.deathId"];
+    Hooks.call("updateActor", hit.actor, { system: { attributes: { hp: { value: 0 } } }, flags: { "minion-bang": { deathId: updates["flags.minion-bang.deathId"] } } }, {});
+  }
   for (let i = 0; i < 20 && !chat.length && !dialogState.template; i += 1) await new Promise(r => setTimeout(r, 10));
   await new Promise(r => setTimeout(r, 50));
 
   const killed = others.filter(t => t.actor.updates.length > 0).map(t => t.id);
-  return { updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
+  return { minionKills: [...minionKills], others, updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
 }
 
 let failures = 0;
@@ -423,7 +447,7 @@ function check(label, actual, expected) {
   game.settings.get = savedGet;
   game.settings.set = savedSet;
   foundry.utils = savedUtils;
-  delete game.user.isGM;
+  game.user.isGM = true;
   check("Combat Stats counts a kill for every extra minion killed by the overkill, with the attacker as author", [r.killed.length, calls.length, [...new Set(calls.map(c => c.name))]], [r.killed.length, r.killed.length, ["Akra"]]);
   check("the extra minions join the defeated enemies", fight.defeated.length, r.killed.length);
   check("at least one extra minion was killed in that scenario", r.killed.length > 0, true);
@@ -507,6 +531,43 @@ function check(label, actual, expected) {
 {
   const r = await runScenario({ damage: 6 });
   check("6 damage on 6 HP: no overkill dialog", r.template, null);
+}
+
+{
+  const r = await runScenario({ damage: 19, script: [] });
+  const k = r.minionKills;
+  check("contract 2: hit minion and 3 by overkill make 4 events", k.length, 4);
+  check("contract 2: the hit minion is direct, the others overkill", k.map(e => [e.victim.tokenUuid, e.cause]), [["Scene.s.Token.g0", "direct"], ["Scene.s.Token.g1", "overkill"], ["Scene.s.Token.g2", "overkill"], ["Scene.s.Token.g3", "overkill"]]);
+  check("contract 2: four different event ids", new Set(k.map(e => e.eventId)).size, 4);
+  check("contract 2: each event id is the death id saved on the minion", k.slice(1).map(e => e.eventId), r.others.slice(0, 3).map(t => t.actor.deathId));
+  check("contract 1-2: same attacker on every event", k.map(e => e.attacker), Array(4).fill({ actorId: "Aatt", actorUuid: "Actor.att", tokenUuid: "Scene.s.Token.att", name: "Akra" }));
+  check("contract: workflowId is the chat card of the attack, the same for all", k.map(e => e.workflowId), Array(4).fill("ChatMessage.card1"));
+  check("contract: itemUuid of the weapon", k[0]?.itemUuid, "Item.longsword");
+  check("contract 9: out of combat, no combat data", [k[0]?.combatId, k[0]?.round, k[0]?.turn], [null, null, null]);
+  check("contract: schema version 1 and the scene", [k[0]?.schemaVersion, k[0]?.sceneId], [1, "scene1"]);
+}
+{
+  const r = await runScenario({ damage: 6 });
+  check("contract 1: a minion killed with no overkill makes one direct event", r.minionKills.map(e => [e.cause, e.attacker?.name]), [["direct", "Akra"]]);
+}
+{
+  const r = await runScenario({ damage: 10, script: ["yes"] });
+  check("contract 5: opportunity attack, only the hit minion", r.minionKills.map(e => e.cause), ["direct"]);
+  const c = await runScenario({ damage: 10, cancel: true });
+  check("contract 5: overkill cancelled, only the hit minion", c.minionKills.map(e => e.cause), ["direct"]);
+}
+{
+  const r = await runScenario({ damage: 18, forced: ["g1", "g2"], tweak: ({ others }) => { others[0].actor.update = async () => { throw new Error("update refused"); }; } });
+  check("contract 5: failed hit point update, no event for that minion", r.minionKills.map(e => e.victim.tokenUuid), ["Scene.s.Token.g0", "Scene.s.Token.g2"]);
+}
+{
+  const r = await runScenario({ damage: 10, tweak: ({ hit }) => { hit.actor.system.attributes.hp.value = 0; } });
+  check("contract: a minion already at 0 hit points makes no direct event", r.minionKills.filter(e => e.victim.tokenUuid === "Scene.s.Token.g0").length, 0);
+}
+{
+  const r = await runScenario({ damage: 10, script: [], tweak: ({ others }) => { others[0].actor.system.details = { cr: 0.125 }; } });
+  check("contract 8: CR 1/8 is kept, with 5 minions per standard creature", [r.minionKills[1]?.victim.cr, r.minionKills[1]?.victim.minionsPerStandard], [0.125, 5]);
+  check("contract 8: unknown CR stays null", [r.minionKills[0]?.victim.cr, r.minionKills[0]?.victim.minionsPerStandard], [null, null]);
 }
 
 console.log(failures === 0 ? "\nAll GM flow checks passed.\n" : `\n${failures} GM flow check(s) failed.\n`);

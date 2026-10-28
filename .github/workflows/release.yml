@@ -36,6 +36,8 @@ jobs:
         run: node tests/existing-bands-adapter.test.mjs
       - name: Kill credit for Combat Stats
         run: node tests/kill-credit.test.mjs
+      - name: Minion kill hook
+        run: node tests/minion-kill.test.mjs
       - name: Kill credit in the combat
         run: node tests/combat-stats-credit.test.mjs
       - name: Band apply plan

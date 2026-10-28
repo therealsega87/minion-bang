@@ -1,6 +1,7 @@
 import { promptOverkillDialog, closeOverkillDialog } from "../ui/overkill-dialog.js";
 import { promptWaitingDialog, closeWaitingDialog } from "../ui/waiting-dialog.js";
 import { MODULE_ID, debugLog, warnLog } from "../log.js";
+import { registerMinionKillRelay } from "../adapters/minion-kill-hook.js";
 
 let socket = null;
 
@@ -13,6 +14,7 @@ export function initSocket() {
   socket = socketlib.registerModule(MODULE_ID);
   socket.register("promptOverkill", (payload) => promptOverkillDialog(payload));
   socket.register("closeOverkill", (requestId) => closeOverkillDialog(requestId));
+  registerMinionKillRelay(socket);
 }
 
 export async function requestOverkillConfirmation(userId, payload) {

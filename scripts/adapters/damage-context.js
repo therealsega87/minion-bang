@@ -7,6 +7,8 @@ import { MODULE_ID, debugLog, warnLog, errorLog, escapeHtml } from "../log.js";
 import { isMinionActor, statBlockKey } from "../minion-flags.js";
 import { opportunityAttackQuestion, killRecord, markDefeated } from "../combat-state.js";
 import { updateWithKillCredit } from "./combat-stats-credit.js";
+import { isRealDeath } from "../engine/minion-kill.js";
+import { DEATH_FLAG_PATH, expectMinionDeath, newDeathId } from "./minion-kill-hook.js";
 
 const DEFAULT_IMAGE = "icons/svg/mystery-man.svg";
 
@@ -187,6 +189,7 @@ export function applyMinionDamage(actor, amount, updates, options) {
     updates["system.attributes.hp.temp"] = instruction.hpTemp;
     const record = killRecord(capture.attack?.attackerTokenUuid, capture.attack?.attackerName);
     updates[`flags.${MODULE_ID}.killedBy`] = record;
+    if (isRealDeath(actor.system?.attributes?.hp?.value, instruction.hpValue)) updates[DEATH_FLAG_PATH] = newDeathId();
     debugLog(`Hit points set to 0, ${describeKill(record)}.`);
   }
 
@@ -197,33 +200,41 @@ export function applyMinionDamage(actor, amount, updates, options) {
 
   if (instruction.cancel) return false;
 
+  if (updates[DEATH_FLAG_PATH]) {
+    expectMinionDeath(updates[DEATH_FLAG_PATH], { tokenDocument: hitDocument, cause: "direct", attack: capture.attack ?? null });
+  }
+  const overkill = prepareOverkill(actor, capture, options, effectiveDamage, hpMax, hitDocument);
+  if (overkill) enqueueOverkill(overkill.decidingUserId, overkill.payload, capture.attack);
+}
+
+function prepareOverkill(actor, capture, options, effectiveDamage, hpMax, hitDocument) {
   const context = capture.attack;
   if (!context) {
     warnLog("No attack details were captured for this target: skipping overkill.");
-    return;
+    return null;
   }
 
   if (!isWeaponAttack(context)) {
     debugLog(`No overkill: the attack isn't mwak/rwak (actionType: ${context.actionType ?? "unknown"}).`);
-    return;
+    return null;
   }
 
   const { excess, additionalCount } = computeOverkill(effectiveDamage, hpMax);
   if (additionalCount === 0) {
     debugLog("No overkill: damage matches the hit point maximum exactly, no excess.");
-    return;
+    return null;
   }
 
   if (context.attackerType !== "character") {
     debugLog(`No overkill: ${context.attackerName ?? "the attacker"} is not a player character `
       + `(${context.attackerType ?? "unknown type"}).`);
-    return;
+    return null;
   }
 
   if (!hitDocument?.object || hitDocument.parent !== canvas.scene) {
     warnLog("Overkill skipped: the GM is not viewing the scene where the attack happened.");
     ui.notifications?.warn(game.i18n.localize("MINIONBANG.Notify.SceneNotViewed"));
-    return;
+    return null;
   }
   const hitToken = hitDocument.object;
 
@@ -231,7 +242,7 @@ export function applyMinionDamage(actor, amount, updates, options) {
     ?? canvas.tokens?.placeables.find(t => t.actor?.uuid === options?.midi?.sourceActorUuid);
   if (!attackerToken) {
     warnLog("Overkill skipped: the attacker's token is not on the scene.");
-    return;
+    return null;
   }
 
   const others = findSameStatBlockCandidates(hitToken, actor, context.targetUuids);
@@ -252,7 +263,7 @@ export function applyMinionDamage(actor, amount, updates, options) {
     const shortRange = toSceneUnits(context.rangeValue, context.rangeUnits);
     if (!Number.isFinite(shortRange)) {
       warnLog("Ranged overkill detected but the weapon's short range is unknown.");
-      return;
+      return null;
     }
     const lineWidth = canvas.scene?.grid?.distance ?? 5;
     debugLog(`Overkill geometry: ${context.attackerName}, ${context.itemName}, mode ${context.attackMode ?? "default"}, `
@@ -287,7 +298,7 @@ export function applyMinionDamage(actor, amount, updates, options) {
 
   debugLog(`Overkill: excess ${excess}, up to ${additionalCount} more minions.`);
   debugLog(`Proposed: ${listOrNone(proposed.map(c => c.id))}. Shortfall: ${shortfall}. Preselected: ${autoSelectEnabled() ? "yes" : "no (setting off)"}.`);
-  if (eligible.length === 0) return;
+  if (eligible.length === 0) return null;
 
   const attackerActor = attackerToken.actor;
   const decidingUserId = resolveDecidingUserId(attackerActor);
@@ -308,17 +319,17 @@ export function applyMinionDamage(actor, amount, updates, options) {
     autoSelect: autoSelectEnabled()
   };
 
-  enqueueOverkill(decidingUserId, payload);
+  return { decidingUserId, payload };
 }
 
 let overkillQueue = Promise.resolve();
 let pendingOverkills = 0;
 
-function enqueueOverkill(decidingUserId, payload) {
+function enqueueOverkill(decidingUserId, payload, attack) {
   if (pendingOverkills > 0) debugLog(`Overkill dialog queued behind ${pendingOverkills} other(s).`);
   pendingOverkills += 1;
   overkillQueue = overkillQueue
-    .then(() => runOverkillConfirmation(decidingUserId, payload))
+    .then(() => runOverkillConfirmation(decidingUserId, payload, attack))
     .catch(err => errorLog("Error while confirming overkill:", err))
     .finally(() => { pendingOverkills -= 1; });
 }
@@ -338,7 +349,7 @@ async function announceNoOverkill(payload, emptyConfirm) {
   });
 }
 
-async function runOverkillConfirmation(decidingUserId, payload) {
+async function runOverkillConfirmation(decidingUserId, payload, attack) {
   const answer = await requestOverkillConfirmation(decidingUserId, payload);
   if (!answer || typeof answer !== "object") {
     debugLog(`Overkill cancelled: ${payload.attackerName} decided not to overkill.`);
@@ -373,11 +384,14 @@ async function runOverkillConfirmation(decidingUserId, payload) {
       debugLog(`${candidate.name} (${id}) is already down, skipped.`);
       continue;
     }
+    const deathId = newDeathId();
+    expectMinionDeath(deathId, { tokenDocument: document, cause: "overkill", attack });
     try {
       await updateWithKillCredit(minion, payload.killRecord, () => minion.update({
         "system.attributes.hp.value": 0,
         "system.attributes.hp.temp": 0,
-        [`flags.${MODULE_ID}.killedBy`]: payload.killRecord
+        [`flags.${MODULE_ID}.killedBy`]: payload.killRecord,
+        [DEATH_FLAG_PATH]: deathId
       }));
     } catch (error) {
       errorLog(`${candidate.name} (${id}) could not be downed by the overkill:`, error);
