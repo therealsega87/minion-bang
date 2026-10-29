@@ -13,7 +13,8 @@ Unusual situations, one line each.
 | A monster or an NPC attacks | The Minion trait applies. No overkill. |
 | A spell attack hits | The Minion trait applies. No overkill. |
 | One attack hits several targets | Each target is handled on its own, and none of them is offered as an extra minion. |
-| A minion already at 0 hit points is hit again | No new death is recorded, but the hit can still start an overkill. |
+| A minion already at 0 hit points is hit again | No new death is recorded and no overkill starts. |
+| Someone applies the damage with the button on Midi-QOL's damage card | Same as when Midi-QOL applies it on its own. |
 | Someone edits a minion's hit points by hand | The Minion trait doesn't apply. |
 
 ## Overkill
@@ -28,6 +29,9 @@ Unusual situations, one line each.
 | The player answers **Yes (no overkill)** | Nothing more falls once they click **Confirm**. No chat message. |
 | The player clicks **Confirm** with no minion checked | No overkill. The chat says so. |
 | An extra minion can't be downed | The others fall. The GM sees which ones failed. |
+| The GM undoes the attack from Midi-QOL's damage card | The minion hit and the minions its overkill took down stand up. The GM gets a whispered note. |
+| A downed minion is healed, or its hit points are raised by hand | Only that minion stands up. |
+| A minion the overkill took down has been killed again since | The undo leaves it down. |
 
 ## Bands
 

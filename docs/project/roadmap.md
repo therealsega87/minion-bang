@@ -4,7 +4,6 @@ Nothing here has a date.
 
 ## Next
 
-- **Undo the last overkill.** A GM button revives the minions the last overkill downed, with their hit points, status and tracker mark restored.
 - **Band status in the tracker.** A count next to each band showing how many members are still standing.
 - **Newer dnd5e and Midi-QOL.** Minion! follows them once they are released and tested.
 

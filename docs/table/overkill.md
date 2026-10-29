@@ -100,6 +100,14 @@ An opportunity attack leaves no message.
   <figcaption>The overkill message in the chat.</figcaption>
 </figure>
 
+## Undoing an overkill
+
+Clicking the undo button on Midi-QOL's damage card undoes the whole attack. The minion you hit stands up, and so do the minions its overkill took down, with the hit points they had before. They lose the Dead status and the defeated mark.
+
+The GM gets a whispered note, for example *"Akra's overkill is undone: 3 minion(s) stand up again."* Players see nothing in the chat: the GM tells the table.
+
+A minion stays down if something else has killed it since the overkill. Healing a minion, or raising its hit points by hand, brings back only that minion, never the ones its overkill took down.
+
 ## Who killed whom
 
 Every minion downed by an overkill gets the same [record](../developers/api-and-flags.md#who-killed-a-minion) as the minion you hit: the attacker, the round and the turn. Statistics modules read it, and so does [Combat Stats](../reference/combat-stats.md).

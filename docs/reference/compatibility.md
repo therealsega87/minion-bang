@@ -6,7 +6,7 @@
 |---|---|
 | Foundry VTT | 13 or 14 (verified on 14.368) |
 | dnd5e | 5.3.2 to 5.3.x (verified on 5.3.3) |
-| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 |
+| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 (verified on 14.0.16) |
 | [socketlib](https://foundryvtt.com/packages/socketlib) | any version for your Foundry |
 
 Midi-QOL depends on DAE and libWrapper. Foundry offers to install them along with it.

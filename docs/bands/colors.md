@@ -7,6 +7,8 @@ Every player sees each band's color.
 
 When a minion leaves its band, or the combat ends, its ring gets its original color back.
 
+A minion with the Dead status has a black ring, as dnd5e shows every defeated creature. If it stands up again, the ring takes the band's color back.
+
 <figure markdown="span">
   ![Minion tokens with rings in two band colors and one without](../assets/images/bands-colors.png){ width="640" loading=lazy }
   <figcaption>Two bands in two colors. The token with the white ring keeps its usual color: it isn't in a band.</figcaption>
