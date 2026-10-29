@@ -60,7 +60,8 @@
       "OneMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cade un altro nemico.",
       "ManyMore": "<strong>{attacker}</strong> mette a segno un overkill! Oltre a <strong>{target}</strong>, cadono altri {count} nemici.",
       "NoOverkill": "<strong>{attacker}</strong> ha deciso di non fare un overkill.",
-      "NoOverkillConfirmed": "<strong>{attacker}</strong> ha premuto Conferma ma non ha scelto nessun minion: nessun overkill."
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> ha premuto Conferma ma non ha scelto nessun minion: nessun overkill.",
+      "OverkillUndone": "L'overkill di <strong>{attacker}</strong> è annullato: si rialzano {count} minion."
     },
     "Notify": {
       "SceneNotViewed": "Overkill di Minion! saltato: il GM non sta guardando la scena in cui è avvenuto l'attacco.",

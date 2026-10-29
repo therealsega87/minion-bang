@@ -9,6 +9,7 @@ import { opportunityAttackQuestion, killRecord, markDefeated } from "../combat-s
 import { updateWithKillCredit } from "./combat-stats-credit.js";
 import { isRealDeath } from "../engine/minion-kill.js";
 import { DEATH_FLAG_PATH, expectMinionDeath, newDeathId } from "./minion-kill-hook.js";
+import { recordOverkill, undoOverkill } from "./overkill-undo.js";
 
 const DEFAULT_IMAGE = "icons/svg/mystery-man.svg";
 
@@ -39,11 +40,20 @@ function classifyOrigin(capture, options) {
 
 function computeEffectiveDamage(capture) {
   const { default: base = 0, other = 0, bonus = 0 } = capture.damage ?? {};
-  const includeOther = globalThis.MidiQOL?.configSettings?.()?.singleConcentrationRoll === true;
-  const total = base + bonus + (includeOther ? other : 0);
-  debugLog(`Damage passes: default ${base}, other ${other}${includeOther ? "" : " (not applied)"}, `
-    + `bonus ${bonus} -> effective ${Math.floor(total)}. Healing ${capture.healing ?? 0}, temp HP ${capture.tempHp ?? 0}.`);
+  const total = base + other + bonus;
+  debugLog(`Damage passes: default ${base}, other ${other}, bonus ${bonus} -> effective ${Math.floor(total)}. `
+    + `Healing ${capture.healing ?? 0}, temp HP ${capture.tempHp ?? 0}.`);
   return Math.max(0, Math.floor(total));
+}
+
+function capturedData(options) {
+  return options?.minionBang ?? options?.midi?.minionBang ?? null;
+}
+
+function raisesHitPoints(actor, updates) {
+  const next = updates?.["system.attributes.hp.value"];
+  const current = actor.system?.attributes?.hp?.value;
+  return Number.isFinite(next) && Number.isFinite(current) && next > current;
 }
 
 function isWeaponAttack(context) {
@@ -155,7 +165,7 @@ function rangedCandidatesForToken(attackerToken, hitToken, otherTokens) {
 export function applyMinionDamage(actor, amount, updates, options) {
   if (!isMinionActor(actor)) return;
 
-  const capture = options?.minionBang;
+  const capture = capturedData(options);
   if (!capture) {
     debugLog(`${actor.name}: hit point change without Midi-QOL damage data (likely a manual edit), ignored.`);
     return;
@@ -167,6 +177,18 @@ export function applyMinionDamage(actor, amount, updates, options) {
     return;
   }
 
+  if (raisesHitPoints(actor, updates)) {
+    debugLog(`${actor.name}: this update raises the hit points (undo or healing), left untouched.`);
+    if ((actor.system?.attributes?.hp?.value ?? 0) <= 0) {
+      const document = (options?.midi?.targetUuid && fromUuidSync(options.midi.targetUuid))
+        ?? canvas.tokens?.placeables.find(t => t.actor?.uuid === actor.uuid)?.document ?? null;
+      Promise.resolve().then(() => undoOverkill(document, actor, capture))
+        .catch(err => errorLog("Error while undoing the overkill:", err));
+    }
+    return;
+  }
+
+  const alreadyDown = (actor.system?.attributes?.hp?.value ?? 0) <= 0;
   const effectiveDamage = computeEffectiveDamage(capture);
   if (effectiveDamage === 0 && ((capture.healing ?? 0) > 0 || (capture.tempHp ?? 0) > 0)) {
     debugLog(`${actor.name}: healing or temporary hit points with no damage, update left untouched.`);
@@ -202,6 +224,10 @@ export function applyMinionDamage(actor, amount, updates, options) {
 
   if (updates[DEATH_FLAG_PATH]) {
     expectMinionDeath(updates[DEATH_FLAG_PATH], { tokenDocument: hitDocument, cause: "direct", attack: capture.attack ?? null });
+  }
+  if (alreadyDown) {
+    debugLog(`${actor.name} was already at 0 hit points: no overkill.`);
+    return;
   }
   const overkill = prepareOverkill(actor, capture, options, effectiveDamage, hpMax, hitDocument);
   if (overkill) enqueueOverkill(overkill.decidingUserId, overkill.payload, capture.attack);
@@ -307,6 +333,8 @@ function prepareOverkill(actor, capture, options, effectiveDamage, hpMax, hitDoc
   const payload = {
     askOpportunityAttack: opportunity.ask,
     killRecord: killRecord(context.attackerTokenUuid, context.attackerName),
+    attackId: context.attackId ?? null,
+    hitTokenUuid: hitDocument.uuid,
     attackerName: attackerActor?.name ?? game.i18n.localize("MINIONBANG.Unknown"),
     hitTokenName: hitToken.name,
     hitTokenImg: hitToken.document?.texture?.src ?? hitToken.actor?.img ?? DEFAULT_IMAGE,
@@ -375,6 +403,7 @@ async function runOverkillConfirmation(decidingUserId, payload, attack) {
   }
   const killedNames = [];
   const failedNames = [];
+  const victims = [];
   for (const id of accepted) {
     const candidate = allowed.get(id);
     const document = candidate.uuid ? fromUuidSync(candidate.uuid) : null;
@@ -385,6 +414,7 @@ async function runOverkillConfirmation(decidingUserId, payload, attack) {
       continue;
     }
     const deathId = newDeathId();
+    const before = { tokenUuid: candidate.uuid, deathId, hp: minion.system.attributes.hp.value, temp: minion.system.attributes.hp.temp ?? 0 };
     expectMinionDeath(deathId, { tokenDocument: document, cause: "overkill", attack });
     try {
       await updateWithKillCredit(minion, payload.killRecord, () => minion.update({
@@ -400,6 +430,12 @@ async function runOverkillConfirmation(decidingUserId, payload, attack) {
     }
     await markDefeated(document);
     killedNames.push(minion.name);
+    victims.push(before);
+  }
+  try {
+    await recordOverkill(payload.hitTokenUuid, { attackId: payload.attackId, attackerName: payload.attackerName, victims });
+  } catch (error) {
+    warnLog("The overkill could not be remembered for undo:", error);
   }
   if (failedNames.length > 0) {
     ui.notifications?.error(game.i18n.format("MINIONBANG.Notify.OverkillFailed", { names: failedNames.join(", ") }));

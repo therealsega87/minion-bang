@@ -50,6 +50,7 @@ Minion! brings the minion rules of MCDM's *Flee, Mortals!* to Foundry VTT for D&
 - Melee attacks reach as far as the weapon does. Ranged attacks carry on along a line, up to the weapon's short range.
 - Opportunity attacks never cause overkill: when an attack comes outside the attacker's turn, the dialog asks.
 - While the player decides, the GM can wait, decide for them or cancel. Every overkill ends with a message in the chat.
+- Undo the attack from Midi-QOL's damage card, and every minion it took down stands up again.
 
 ### 👥 Shared turns and bands (optional)
 

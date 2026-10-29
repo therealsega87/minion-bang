@@ -60,7 +60,8 @@
       "OneMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, one more enemy falls.",
       "ManyMore": "<strong>{attacker}</strong> lands an overkill! Besides <strong>{target}</strong>, {count} more enemies fall.",
       "NoOverkill": "<strong>{attacker}</strong> decided not to overkill.",
-      "NoOverkillConfirmed": "<strong>{attacker}</strong> pressed Confirm but chose no minion: no overkill."
+      "NoOverkillConfirmed": "<strong>{attacker}</strong> pressed Confirm but chose no minion: no overkill.",
+      "OverkillUndone": "<strong>{attacker}</strong>'s overkill is undone: {count} minion(s) stand up again."
     },
     "Notify": {
       "SceneNotViewed": "Minion! overkill skipped: the GM is not viewing the scene where the attack happened.",

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.6.1
+
+- Fix: damage applied with the button on Midi-QOL's damage card now triggers the Minion trait and the overkill. Since Midi-QOL 14.0.12 the card dropped the data Minion! needs, so the hit was treated like a manual edit.
+- The damage that counts is now everything that reaches the hit points: base, other and bonus damage. It no longer depends on Midi-QOL's "Single Concentration Check" setting.
+- Works with Midi-QOL's "Single Damage Calculation" setting, on or off.
+- Undoing an attack with the undo button on Midi-QOL's damage card now also brings back the minions its overkill took down. The hit minion and the others lose the Dead status and the defeated mark, and the GM gets a whispered note. Healing or editing hit points by hand never brings anyone else back.
+- A minion already at 0 hit points that takes damage again no longer starts an overkill.
+- Fix: a minion's dynamic ring could keep the wrong colour when it died or stood up again: the band colour on a dead minion, black on a living one. When hit points change, dnd5e flashes the ring and the flash ends on the colour the ring had when it started, even if Dead was added or removed in the meantime. Minion! now redraws the ring of a minion once the flash is over, on every client.
+- When Midi-QOL handles the Dead status, the undo leaves it to Midi-QOL and removes Dead only if it is still there a second later. This stops the "does not exist" error notifications.
+
 ## 1.6.0
 
 - New hook for other modules: `minion-bang.minionKill`. Minion! calls it once for each minion that dies, on the active GM's client, with the attacker, the cause (hit, overkill or other), the minion's challenge rating and the fight's round and turn. Each death gets an id saved on the minion in `flags.minion-bang.deathId`.

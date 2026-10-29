@@ -48,6 +48,8 @@ jobs:
         run: node tests/band-markers.test.mjs
       - name: Token colours in the scene
         run: node tests/token-colors-adapter.test.mjs
+      - name: Ring colour after the flash
+        run: node tests/ring-repair.test.mjs
       - name: Band window model
         run: node tests/band-window-model.test.mjs
       - name: Band source tokens

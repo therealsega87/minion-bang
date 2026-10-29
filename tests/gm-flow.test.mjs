@@ -46,7 +46,7 @@ globalThis.ui = { notifications: { warn() {}, info: text => { notices.push(text)
 globalThis.CONFIG = { specialStatusEffects: { DEFEATED: "dead", INVISIBLE: "invisible" } };
 
 const chat = [];
-globalThis.ChatMessage = { create: async data => { chat.push(data); } };
+globalThis.ChatMessage = { create: async data => { chat.push(data); }, getWhisperRecipients: () => [{ id: "gm" }] };
 
 const scene = { id: "scene1", grid: { units: "ft", distance: 5, size: 100 } };
 const canvasTokens = [];
@@ -56,8 +56,9 @@ globalThis.canvas = {
   tokens: { get placeables() { return canvasTokens; }, get: id => canvasTokens.find(t => t.id === id) }
 };
 
+const midiSettings = { singleConcentrationRoll: true, singleDamageCalculation: false, addDead: "overlay", markNonPlayerDefeated: true };
 globalThis.MidiQOL = {
-  configSettings: () => ({ singleConcentrationRoll: true, addDead: "overlay", markNonPlayerDefeated: true }),
+  configSettings: () => midiSettings,
   computeDistance: (a, b) => (Math.max(Math.abs(a.center.x - b.center.x), Math.abs(a.center.y - b.center.y)) / 100) * 5
 };
 
@@ -165,6 +166,7 @@ const { applyMinionDamage } = await import("../scripts/adapters/damage-context.j
 const { registerMinionDeathWatch } = await import("../scripts/adapters/minion-kill-hook.js");
 registerMinionDeathWatch();
 const logModule = await import("../scripts/log.js");
+const { MIDI_GRACE_MS } = await import("../scripts/adapters/overkill-undo.js");
 
 registerDamageCapture();
 
@@ -179,14 +181,25 @@ function makeToken(id, name, gx, gy, { type = "npc", minion = true } = {}) {
     system: { attributes: { hp: { value: 6, max: 6 } } },
     statuses: new Set(),
     updates: [],
+    moduleFlags: {},
+    statusCalls: [],
+    async setFlag(scope, key, value) { if (scope === "minion-bang") this.moduleFlags[key] = JSON.parse(JSON.stringify(value)); },
+    async unsetFlag(scope, key) { if (scope === "minion-bang") delete this.moduleFlags[key]; },
     async update(data) {
       this.updates.push(data);
+      if (data["system.attributes.hp.value"] > 0) { this.system.attributes.hp.value = data["system.attributes.hp.value"]; return; }
       this.system.attributes.hp.value = 0;
       if (data["flags.minion-bang.deathId"]) this.deathId = data["flags.minion-bang.deathId"];
       Hooks.call("updateActor", this, { system: { attributes: { hp: { value: 0 } } }, flags: { "minion-bang": { deathId: data["flags.minion-bang.deathId"] } } }, {});
     },
-    getFlag(scope, key) { return scope === "minion-bang" && key === "deathId" ? this.deathId : undefined; },
-    async toggleStatusEffect() {},
+    getFlag(scope, key) {
+      if (scope !== "minion-bang") return undefined;
+      return key === "deathId" ? this.deathId : this.moduleFlags[key];
+    },
+    async toggleStatusEffect(id, { active } = {}) {
+      this.statusCalls.push([id, active]);
+      if (active) this.statuses.add(id); else this.statuses.delete(id);
+    },
     testUserPermission: () => false
   };
   const token = {
@@ -215,7 +228,16 @@ function makeToken(id, name, gx, gy, { type = "npc", minion = true } = {}) {
   return token;
 }
 
-async function runScenario({ damage, script = [], forced = null, cancel = false, closeWithX = false, autoSelect = true, tweak = null }) {
+function storedOnCard(options) {
+  const midi = JSON.parse(JSON.stringify(options.midi));
+  delete midi.targetUuid;
+  delete midi.sourceActorUuid;
+  return { midi: { ...midi, targetUuid: options.midi.targetUuid } };
+}
+
+async function runScenario({ damage, script = [], forced = null, cancel = false, closeWithX = false, autoSelect = true, tweak = null, flow = "three", other = 0, concentration = true, applyUpdates = null }) {
+  midiSettings.singleDamageCalculation = flow !== "three";
+  midiSettings.singleConcentrationRoll = concentration;
   canvasTokens.length = 0;
   registry.clear();
   chat.length = 0;
@@ -250,13 +272,20 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   const options = { midi: { targetUuid: hit.document.uuid, sourceActorUuid: attacker.actor.uuid } };
 
   Hooks.call("midi-qol.DamageRollComplete", workflow);
-  Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [{ type: "slashing", value: damage }], options);
-  Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [], options);
-  Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [], options);
+  if (flow === "three") {
+    Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [{ type: "slashing", value: damage }], options);
+    Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, other ? [{ type: "poison", value: other }] : [], options);
+    Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, [], options);
+  } else {
+    const all = [{ type: "slashing", value: damage }];
+    if (other) all.push({ type: "poison", value: other });
+    Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, all, options);
+    if (flow === "render") Hooks.call("midi-qol.dnd5eCalculateDamage", hit.actor, all, { midi: { targetUuid: hit.document.uuid } });
+  }
 
-  const updates = {};
+  const updates = applyUpdates ? { ...applyUpdates } : {};
   minionKills.length = 0;
-  applyMinionDamage(hit.actor, -6, updates, options);
+  applyMinionDamage(hit.actor, -6, updates, flow === "card" ? storedOnCard(options) : options);
   if (updates["system.attributes.hp.value"] === 0) {
     hit.actor.system.attributes.hp.value = 0;
     hit.actor.deathId = updates["flags.minion-bang.deathId"];
@@ -266,7 +295,7 @@ async function runScenario({ damage, script = [], forced = null, cancel = false,
   await new Promise(r => setTimeout(r, 50));
 
   const killed = others.filter(t => t.actor.updates.length > 0).map(t => t.id);
-  return { minionKills: [...minionKills], others, updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
+  return { hit, options, minionKills: [...minionKills], others, updates, killed, ringsAfterScript: dialogState.ringsAfterScript, template: dialogState.template, limitLine: dialogState.limitLine, ringsAtOpen: dialogState.ringsAtOpen, list: dialogState.list, inputs: dialogState.inputs, chat: [...chat], notices: [...notices] };
 }
 
 let failures = 0;
@@ -568,6 +597,159 @@ function check(label, actual, expected) {
   const r = await runScenario({ damage: 10, script: [], tweak: ({ others }) => { others[0].actor.system.details = { cr: 0.125 }; } });
   check("contract 8: CR 1/8 is kept, with 5 minions per standard creature", [r.minionKills[1]?.victim.cr, r.minionKills[1]?.victim.minionsPerStandard], [0.125, 5]);
   check("contract 8: unknown CR stays null", [r.minionKills[0]?.victim.cr, r.minionKills[0]?.victim.minionsPerStandard], [null, null]);
+}
+
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "single" });
+  check("1.6.1 single damage calculation: the hit minion dies", r.updates["system.attributes.hp.value"], 0);
+  check("1.6.1 single damage calculation: 19 damage allows 3 more", r.template.limitText.includes('"max":3'), true);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "render" });
+  check("1.6.1 single damage calculation, Midi recalculates for the damage card: still 3 more, not 6", r.template.limitText.includes('"max":3'), true);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  check("1.6.1 damage applied from the damage card: the hit minion dies", r.updates["system.attributes.hp.value"], 0);
+  check("1.6.1 damage applied from the damage card: the overkill dialog opens with 3 more", r.template?.limitText.includes('"max":3'), true);
+  check("1.6.1 damage applied from the damage card: three more minions fall", r.killed, ["g1", "g2", "g3"]);
+  check("1.6.1 damage applied from the damage card: the kill has its attacker", r.minionKills[0]?.attacker?.name, "Akra");
+}
+{
+  const r = await runScenario({ damage: 3, flow: "card" });
+  check("1.6.1 a 3-damage hit applied from the damage card still drops the minion", r.updates["system.attributes.hp.value"], 0);
+}
+{
+  const r = await runScenario({ damage: 13, other: 6, script: [], concentration: false });
+  check("1.6.1 other damage always counts: 13 + 6 allows 3 more", r.template.limitText.includes('"max":3'), true);
+}
+{
+  const r = await runScenario({ damage: 19, flow: "card", applyUpdates: { "system.attributes.hp.value": 6 }, tweak: ({ hit }) => { hit.actor.system.attributes.hp.value = 0; } });
+  check("1.6.1 undo from the damage card: the hit points go back up", r.updates["system.attributes.hp.value"], 6);
+  check("1.6.1 undo from the damage card: no overkill", r.template, null);
+}
+{
+  const r = await runScenario({ damage: 19, flow: "card", tweak: ({ hit }) => { hit.actor.system.attributes.hp.value = 0; } });
+  check("1.6.1 a minion already at 0 hit again: no overkill", r.template, null);
+  check("1.6.1 a minion already at 0 hit again: nobody else falls", r.killed, []);
+}
+
+async function undoFromCard(r, { attackId = "ChatMessage.card1", withData = true, wait = MIDI_GRACE_MS + 100 } = {}) {
+  chat.length = 0;
+  const stored = storedOnCard(r.options);
+  if (!withData) delete stored.midi.minionBang;
+  if (stored.midi.minionBang) stored.midi.minionBang.attack = { ...stored.midi.minionBang.attack, attackId };
+  const updates = { "system.attributes.hp.value": 6 };
+  applyMinionDamage(r.hit.actor, -6, updates, stored);
+  r.hit.actor.system.attributes.hp.value = 6;
+  await new Promise(res => setTimeout(res, wait));
+  return { updates, chat: [...chat] };
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  check("1.6.1 overkill remembered on the hit minion", r.hit.actor.moduleFlags.overkill?.victims.map(v => v.tokenUuid), ["Scene.s.Token.g1", "Scene.s.Token.g2", "Scene.s.Token.g3"]);
+  r.hit.actor.statuses.add("dead");
+  r.others.slice(0, 3).forEach(t => t.actor.statuses.add("dead"));
+  const u = await undoFromCard(r);
+  check("1.6.1 undo: the hit minion's hit points go back up", u.updates["system.attributes.hp.value"], 6);
+  check("1.6.1 undo: the overkill victims stand up again", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [6, 6, 6]);
+  check("1.6.1 undo: the minion not touched by the overkill stays as it was", r.others[3].actor.updates.length, 0);
+  check("1.6.1 undo: Dead removed from the victims", r.others.slice(0, 3).map(t => t.actor.statuses.has("dead")), [false, false, false]);
+  check("1.6.1 undo: Dead removed from the hit minion", r.hit.actor.statuses.has("dead"), false);
+  check("1.6.1 undo: one message, whispered to the GM", u.chat.length === 1 && u.chat[0].content.includes("OverkillUndone") && JSON.stringify(u.chat[0].whisper) === JSON.stringify(["gm"]), true);
+  check("1.6.1 undo: the message counts 3 minions", u.chat[0]?.content.includes('"count":3'), true);
+  check("1.6.1 undo: the memory is cleared", r.hit.actor.moduleFlags.overkill, undefined);
+  r.hit.actor.system.attributes.hp.value = 0;
+  r.others.slice(0, 3).forEach(t => { t.actor.system.attributes.hp.value = 0; });
+  const again = await undoFromCard(r);
+  check("1.6.1 a second undo raises nobody", again.chat.length, 0);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  const u = await undoFromCard(r, { attackId: "ChatMessage.healing" });
+  check("1.6.1 healing from another item raises only the minion it heals", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [0, 0, 0]);
+  check("1.6.1 healing from another item: no message", u.chat.length, 0);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.others[1].actor.deathId = "killed-later";
+  await undoFromCard(r);
+  check("1.6.1 undo: a victim killed again since the overkill stays down", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [6, 0, 6]);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.hit.actor.system.attributes.hp.value = 3;
+  await undoFromCard(r);
+  check("1.6.1 hit points raised on a minion still standing: the overkill victims stay down", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [0, 0, 0]);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  await undoFromCard(r, { withData: false });
+  check("1.6.1 hit points raised by hand: the overkill victims stay down", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [0, 0, 0]);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.others.slice(0, 3).forEach(t => {
+    t.actor.statuses.add("dead");
+    t.actor.toggleStatusEffect = async function () { this.statuses.delete("dead"); throw new Error('ActiveEffect "dnd5edead0000000" does not exist!'); };
+  });
+  const u = await undoFromCard(r);
+  check("1.6.1 undo while Midi-QOL removes Dead first: the victims stand up", r.others.slice(0, 3).map(t => t.actor.system.attributes.hp.value), [6, 6, 6]);
+  check("1.6.1 undo while Midi-QOL removes Dead first: the message counts 3 minions", u.chat.length === 1 && u.chat[0].content.includes('"count":3'), true);
+  check("1.6.1 undo while Midi-QOL removes Dead first: no warning", logModule.getRecentLogs().some(l => l.level === "warn" && l.text.includes("could not stand up")), false);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.others.slice(0, 3).forEach(t => {
+    t.actor.statuses.add("dead");
+    let calls = 0;
+    t.actor.toggleStatusEffect = async function () { calls += 1; if (calls === 1) throw new Error("busy"); this.statuses.delete("dead"); };
+  });
+  await undoFromCard(r);
+  await new Promise(res => setTimeout(res, 900));
+  check("1.6.1 undo: a first failed attempt to remove Dead is retried", r.others.slice(0, 3).map(t => t.actor.statuses.has("dead")), [false, false, false]);
+}
+
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  const midiLike = actor => {
+    actor.statuses.add("dead");
+    const update = actor.update.bind(actor);
+    actor.update = async data => { await update(data); if (data["system.attributes.hp.value"] > 0) actor.statuses.delete("dead"); };
+  };
+  midiLike(r.hit.actor);
+  r.others.slice(0, 3).forEach(t => midiLike(t.actor));
+  const u = await undoFromCard(r, { wait: 60 });
+  check("1.6.1 undo with Midi-QOL handling Dead: the message arrives without waiting", u.chat.length === 1 && u.chat[0].content.includes('"count":3'), true);
+  await new Promise(res => setTimeout(res, MIDI_GRACE_MS + 100));
+  check("1.6.1 undo with Midi-QOL handling Dead: Minion! never touches Dead on the victims", r.others.slice(0, 3).map(t => t.actor.statusCalls.length), [0, 0, 0]);
+  check("1.6.1 undo with Midi-QOL handling Dead: the victims end up without Dead", r.others.slice(0, 3).map(t => t.actor.statuses.has("dead")), [false, false, false]);
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.hit.actor.statuses.add("dead");
+  r.others.slice(0, 3).forEach(t => t.actor.statuses.add("dead"));
+  await undoFromCard(r, { wait: 60 });
+  check("1.6.1 undo with Midi-QOL handling Dead: Minion! waits before removing it", r.others.slice(0, 3).map(t => t.actor.statusCalls.length), [0, 0, 0]);
+  await new Promise(res => setTimeout(res, MIDI_GRACE_MS + 100));
+  check("1.6.1 undo, Midi-QOL leaves Dead behind: Minion! removes it after the wait", [r.hit.actor.statuses.has("dead"), ...r.others.slice(0, 3).map(t => t.actor.statuses.has("dead"))], [false, false, false, false]);
+}
+{
+  midiSettings.addDead = "none";
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.hit.actor.statuses.add("dead");
+  r.others.slice(0, 3).forEach(t => t.actor.statuses.add("dead"));
+  await undoFromCard(r, { wait: 60 });
+  check("1.6.1 undo without Midi-QOL handling Dead: Minion! removes it at once", [r.hit.actor.statuses.has("dead"), ...r.others.slice(0, 3).map(t => t.actor.statuses.has("dead"))], [false, false, false, false]);
+  midiSettings.addDead = "overlay";
+}
+{
+  const r = await runScenario({ damage: 19, script: [], flow: "card" });
+  r.hit.actor.statuses.add("dead");
+  await undoFromCard(r, { attackId: "ChatMessage.healing", wait: 60 });
+  check("1.6.1 healing from another item with Midi-QOL handling Dead: Minion! waits on the healed minion too", r.hit.actor.statusCalls.length, 0);
+  await new Promise(res => setTimeout(res, MIDI_GRACE_MS + 100));
+  check("1.6.1 healing from another item: Dead is gone from the healed minion after the wait", r.hit.actor.statuses.has("dead"), false);
 }
 
 console.log(failures === 0 ? "\nAll GM flow checks passed.\n" : `\n${failures} GM flow check(s) failed.\n`);

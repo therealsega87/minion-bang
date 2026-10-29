@@ -3,6 +3,15 @@ const PASSES = ["default", "other", "bonus"];
 
 const attackByTarget = new Map();
 
+function singleDamageCalculation() {
+  return globalThis.MidiQOL?.configSettings?.()?.singleDamageCalculation === true;
+}
+
+function attachPayload(options, payload) {
+  options.minionBang = payload;
+  if (options.midi && typeof options.midi === "object") options.midi.minionBang = payload;
+}
+
 const passesByTarget = new Map();
 
 function buildAttackDetails(workflow) {
@@ -68,7 +77,7 @@ export function registerDamageCapture() {
         },
         pass: 0
       };
-      options.minionBang = entry.payload;
+      attachPayload(options, entry.payload);
       passesByTarget.set(uuid, entry);
     }
 
@@ -77,7 +86,7 @@ export function registerDamageCapture() {
     entry.payload.tempHp += sumOfType(damages, "temphp");
     entry.pass += 1;
 
-    if (entry.pass >= PASSES.length) {
+    if (entry.pass >= PASSES.length || singleDamageCalculation()) {
       passesByTarget.delete(uuid);
       attackByTarget.delete(uuid);
     }

@@ -7,6 +7,7 @@ import { registerAutoGroups, reconcileAllCombats } from "./adapters/auto-groups.
 import { registerGroupInitiative } from "./adapters/group-initiative.js";
 import { registerTurnSync } from "./adapters/turn-sync.js";
 import { registerTokenColors } from "./adapters/token-colors.js";
+import { registerRingRepair } from "./adapters/ring-repair.js";
 import { registerBandTurns } from "./adapters/band-turns.js";
 import { registerBandsButton } from "./ui/bands-button.js";
 import { openBandsWindow } from "./ui/bands-window.js";
@@ -46,6 +47,7 @@ Hooks.once("ready", () => {
   announceGroupsStatus();
   registerTurnSync();
   registerTokenColors();
+  registerRingRepair();
   registerPreviousHpTransport();
 
   if (!game.user.isGM) return;

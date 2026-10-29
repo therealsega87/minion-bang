@@ -60,6 +60,8 @@ function startAs(isGM) {
   if (minionModule.api) delete minionModule.api.openBandsWindow;
   handlers.delete("updateActor");
   handlers.delete("preUpdateActor");
+  handlers.delete("createActiveEffect");
+  handlers.delete("deleteActiveEffect");
   consoleLines.length = 0;
   notifications.length = 0;
   for (const fn of handlers.get("ready") ?? []) fn();
@@ -101,7 +103,8 @@ check("player: no Token HUD hook registered", handlers.has("renderTokenHUD"), fa
 check("player: no grouping hook; only the turn synchronisation and token colour hooks", [(handlers.get("createCombatant") ?? []).length, (handlers.get("updateCombatant") ?? []).length, (handlers.get("createCombatantGroup") ?? []).length, (handlers.get("updateCombatantGroup") ?? []).length, (handlers.get("deleteCombatantGroup") ?? []).length], [1, 2, 2, 2, 2]);
 
 check("player: no bands button hook, the api has no bands window but keeps isMinion", [handlers.has("renderCombatTracker"), typeof minionModule.api?.openBandsWindow, typeof minionModule.api?.isMinion], [false, "undefined", "function"]);
-check("player: no minion death watch, but the previous hit points travel with its updates", [handlers.has("updateActor"), (handlers.get("preUpdateActor") ?? []).length], [false, 1]);
+check("player: no minion death watch, but the previous hit points travel with its updates", [(handlers.get("updateActor") ?? []).length, (handlers.get("preUpdateActor") ?? []).length], [1, 1]);
+check("player: the ring repair watches hit points and the Dead status", [(handlers.get("updateActor") ?? []).length, (handlers.get("createActiveEffect") ?? []).length, (handlers.get("deleteActiveEffect") ?? []).length], [1, 1, 1]);
 check("player: no band turn hooks, only the colour one on the end of a combat", [handlers.has("updateCombat"), (handlers.get("deleteCombat") ?? []).length], [false, 1]);
 
 minionModule.api.custom = "kept";
@@ -114,7 +117,8 @@ check("GM: the grouping hook, the group initiative hook and the turn synchronisa
 check("GM: the band turn hooks are registered, a player has none", [(handlers.get("updateCombat") ?? []).length, (handlers.get("deleteCombat") ?? []).length], [1, 2]);
 check("GM: the bands button hook is registered and the api opens the window", [(handlers.get("renderCombatTracker") ?? []).length, typeof minionModule.api?.openBandsWindow], [1, "function"]);
 check("GM: the api keeps isMinion and the schema version next to the bands window", [typeof minionModule.api?.isMinion, minionModule.api?.minionKillSchemaVersion], ["function", 1]);
-check("GM: the minion death watch is registered", [(handlers.get("updateActor") ?? []).length, (handlers.get("preUpdateActor") ?? []).length], [1, 1]);
+check("GM: the minion death watch is registered next to the ring repair", [(handlers.get("updateActor") ?? []).length, (handlers.get("preUpdateActor") ?? []).length], [2, 1]);
+check("GM: the ring repair watches the Dead status too", [(handlers.get("createActiveEffect") ?? []).length, (handlers.get("deleteActiveEffect") ?? []).length], [1, 1]);
 check("the captaincy is passed on by the GM only (the colours are everybody's)", [(handlers.get("deleteCombatant") ?? []).length], [2]);
 check("every client watches the changes to colour the tokens", [handlers.has("canvasReady"), handlers.has("updateToken"), handlers.has("deleteCombatant")], [true, true, true]);
 check("the line also reaches the diagnostics buffer", getRecentLogs().some(l => l.level === "info" && l.text.includes("9.9.9")), true);
