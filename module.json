@@ -2,10 +2,10 @@
   "id": "minion-bang",
   "title": "Minion!",
   "description": "Automates the Minion trait and overkill rules for D&D 5e, integrated with Midi-QOL: minions die at 0 HP as they should, and a weapon attack that overkills a minion lets you pick which nearby minions fall with it, right on the map.",
-  "version": "1.6.1",
+  "version": "1.7.0-dev.1",
   "compatibility": {
-    "minimum": "13",
-    "verified": "14.368"
+    "minimum": "14.369",
+    "verified": "14.369"
   },
   "relationships": {
     "systems": [
@@ -13,9 +13,9 @@
         "id": "dnd5e",
         "type": "system",
         "compatibility": {
-          "minimum": "5.3.2",
-          "verified": "5.3.3",
-          "maximum": "5.3.99"
+          "minimum": "6.0.6",
+          "verified": "6.0.6",
+          "maximum": "6.0.99"
         }
       }
     ],
@@ -28,7 +28,7 @@
         "id": "midi-qol",
         "type": "module",
         "compatibility": {
-          "minimum": "13.0.64"
+          "minimum": "14.6.4"
         },
         "reason": "Minion! reads Midi-QOL's damage calculation to apply the Minion trait and detect overkill."
       }
@@ -60,10 +60,10 @@
     }
   ],
   "url": "https://github.com/therealsega87/minion-bang",
-  "manifest": "https://github.com/therealsega87/minion-bang/releases/latest/download/module.json",
-  "download": "https://github.com/therealsega87/minion-bang/releases/download/v1.6.1/module.zip",
-  "readme": "https://github.com/therealsega87/minion-bang/blob/main/README.md",
+  "manifest": "https://github.com/therealsega87/minion-bang/releases/download/v1.7.0-dev.1/module.json",
+  "download": "https://github.com/therealsega87/minion-bang/releases/download/v1.7.0-dev.1/module.zip",
+  "readme": "https://github.com/therealsega87/minion-bang/blob/dnd5e-v6/README.md",
   "bugs": "https://github.com/therealsega87/minion-bang/issues",
-  "changelog": "https://github.com/therealsega87/minion-bang/blob/main/CHANGELOG.md",
+  "changelog": "https://github.com/therealsega87/minion-bang/blob/dnd5e-v6/CHANGELOG.md",
   "license": "LICENSE"
 }

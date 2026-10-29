@@ -14,6 +14,15 @@
 
 # 💀 Minion!
 
+> [!WARNING]
+> **This branch is a pre-release for testing Minion! on dnd5e 6.** It isn't on Foundry's package list and it isn't meant for campaigns in progress. For your games, use the [stable version](https://github.com/therealsega87/minion-bang).
+>
+> - Install it from the manifest link of a `1.7.0-dev` pre-release on the [releases page](https://github.com/therealsega87/minion-bang/releases).
+> - It needs Foundry 14.369 or later, dnd5e 6.0.x and Midi-QOL 14.6.4 or later. It won't install on dnd5e 5.3.
+> - It replaces the stable Minion! in that Foundry installation. Back up your world first: moving a world to dnd5e 6 can't be undone.
+> - Combat Stats hasn't been tested on dnd5e 6 yet.
+> - Found a problem? Open an [issue](https://github.com/therealsega87/minion-bang/issues) and say which pre-release you're on.
+
 > Minions should die like minions. Minion! drops them on the first hit, lets a big swing carry on through the crowd, and turns a horde of thirty goblins into a handful of turns.
 
 Minion! brings the minion rules of MCDM's *Flee, Mortals!* to Foundry VTT for D&D 5e. It runs on top of Midi-QOL, so your players attack the way they always do.
@@ -96,9 +105,9 @@ The [first fight walkthrough](https://therealsega87.github.io/minion-bang/gettin
 
 | Package | Version |
 |---|---|
-| Foundry VTT | 13 or 14 |
-| dnd5e | 5.3.2 to 5.3.x |
-| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 13.0.64 or later on Foundry 13, 14.0.11 or later on Foundry 14 |
+| Foundry VTT | 14.369 or later |
+| dnd5e | 6.0.x |
+| [Midi-QOL](https://foundryvtt.com/packages/midi-qol) | 14.6.4 or later. If Foundry's package browser doesn't offer it, install it from the manifest link on the Midi-QOL page. |
 | [socketlib](https://foundryvtt.com/packages/socketlib) | any version for your Foundry |
 
 You don't need the *Flee, Mortals!* module. If it's installed, Minion! recognizes its minions automatically.

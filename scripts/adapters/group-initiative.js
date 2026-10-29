@@ -75,14 +75,18 @@ export async function resetGroupInitiatives(combat) {
   }
 }
 
-function wrapCombatMethod(name, build) {
-  let proto = globalThis.CONFIG?.Combat?.documentClass?.prototype ?? null;
+function wrapMethod(documentName, name, build) {
+  let proto = globalThis.CONFIG?.[documentName]?.documentClass?.prototype ?? null;
   while (proto && !Object.hasOwn(proto, name)) proto = Object.getPrototypeOf(proto);
   if (!proto || proto[name].minionBangWrapped) return false;
   const wrapped = build(proto[name]);
   wrapped.minionBangWrapped = true;
   proto[name] = wrapped;
   return true;
+}
+
+function wrapCombatMethod(name, build) {
+  return wrapMethod("Combat", name, build);
 }
 
 export function wrapResetAll() {
@@ -112,6 +116,26 @@ export function captainsInsteadOfMembers(combat, ids) {
     if (!chosen.includes(use)) chosen.push(use);
   }
   return chosen;
+}
+
+export function ownGroupingKey(combatant) {
+  if (!groupsActive()) return null;
+  const groupId = combatant?._source?.group;
+  const group = groupId ? combatant.parent?.groups?.get(groupId) : null;
+  if (!group || groupMode(group) === INITIATIVE_MODES.CAPTAIN) return null;
+  return combatant.id;
+}
+
+export function wrapInitiativeGroupingKey() {
+  return wrapMethod("Combatant", "getInitiativeGroupingKey", original => function (...args) {
+    try {
+      const own = ownGroupingKey(this);
+      if (own) return own;
+    } catch (error) {
+      errorLog("The initiative grouping key could not be chosen:", error);
+    }
+    return original.apply(this, args);
+  });
 }
 
 export function wrapRollInitiative() {

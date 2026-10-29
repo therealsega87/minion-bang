@@ -4,7 +4,7 @@ import { initSocket } from "./net/socket.js";
 import { registerSettings } from "./settings.js";
 import { announceGroupsStatus } from "./groups-status.js";
 import { registerAutoGroups, reconcileAllCombats } from "./adapters/auto-groups.js";
-import { registerGroupInitiative } from "./adapters/group-initiative.js";
+import { registerGroupInitiative, wrapInitiativeGroupingKey } from "./adapters/group-initiative.js";
 import { registerTurnSync } from "./adapters/turn-sync.js";
 import { registerTokenColors } from "./adapters/token-colors.js";
 import { registerRingRepair } from "./adapters/ring-repair.js";
@@ -48,6 +48,7 @@ Hooks.once("ready", () => {
   registerTurnSync();
   registerTokenColors();
   registerRingRepair();
+  wrapInitiativeGroupingKey();
   registerPreviousHpTransport();
 
   if (!game.user.isGM) return;

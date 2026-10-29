@@ -13,7 +13,8 @@ globalThis.Hooks = {
 class FakeApplication {}
 globalThis.foundry = { applications: { api: { ApplicationV2: FakeApplication } } };
 globalThis.canvas = { scene: null };
-globalThis.CONFIG = { DND5E: { characterFlags: {} } };
+class FakeCombatant { getInitiativeGroupingKey() { return null; } }
+globalThis.CONFIG = { DND5E: { characterFlags: {} }, Combatant: { documentClass: FakeCombatant } };
 globalThis.document = { createElement: () => ({}) };
 
 const registered = {};
@@ -100,6 +101,7 @@ startAs(false);
 check("player: the version is written to the console", consoleLines.some(l => l.includes("Minion! 9.9.9 ready (player).")), true);
 check("player: no damage hook registered", handlers.has("dnd5e.preApplyDamage"), false);
 check("player: no Token HUD hook registered", handlers.has("renderTokenHUD"), false);
+check("player: the initiative grouping key of dnd5e 6 is wrapped on every client", FakeCombatant.prototype.getInitiativeGroupingKey.minionBangWrapped, true);
 check("player: no grouping hook; only the turn synchronisation and token colour hooks", [(handlers.get("createCombatant") ?? []).length, (handlers.get("updateCombatant") ?? []).length, (handlers.get("createCombatantGroup") ?? []).length, (handlers.get("updateCombatantGroup") ?? []).length, (handlers.get("deleteCombatantGroup") ?? []).length], [1, 2, 2, 2, 2]);
 
 check("player: no bands button hook, the api has no bands window but keeps isMinion", [handlers.has("renderCombatTracker"), typeof minionModule.api?.openBandsWindow, typeof minionModule.api?.isMinion], [false, "undefined", "function"]);

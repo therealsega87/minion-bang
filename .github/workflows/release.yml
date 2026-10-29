@@ -2,7 +2,7 @@ name: Test and release
 
 on:
   push:
-    branches: [main]
+    branches: [main, dnd5e-v6]
   pull_request:
   release:
     types: [published]
@@ -50,6 +50,8 @@ jobs:
         run: node tests/token-colors-adapter.test.mjs
       - name: Ring colour after the flash
         run: node tests/ring-repair.test.mjs
+      - name: Band initiative on dnd5e 6
+        run: node tests/dnd5e6-initiative.test.mjs
       - name: Band window model
         run: node tests/band-window-model.test.mjs
       - name: Band source tokens

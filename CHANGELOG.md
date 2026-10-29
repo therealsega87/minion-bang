@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0-dev.1
+
+Pre-release for testing Minion! on dnd5e 6. It installs only from its manifest link and isn't meant for campaigns in progress.
+
+- Runs on Foundry 14.369 or later, dnd5e 6.0.x and Midi-QOL 14.6.4 or later. It doesn't install on dnd5e 5.3: keep 1.6.1 there.
+- Fix for dnd5e 6: in the average, highest, lowest and median modes, every band member rolls its own initiative again. dnd5e 6 rolled once for the whole band and copied that roll to every member. The captain mode was not affected.
+- Combat Stats hasn't been tested on dnd5e 6 yet.
+
 ## 1.6.1
 
 - Fix: damage applied with the button on Midi-QOL's damage card now triggers the Minion trait and the overkill. Since Midi-QOL 14.0.12 the card dropped the data Minion! needs, so the hit was treated like a manual edit.

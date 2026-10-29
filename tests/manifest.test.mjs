@@ -21,10 +21,11 @@ function check(label, actual, expected) {
 const repo = "therealsega87/minion-bang";
 
 check("the id is minion-bang", manifest.id, "minion-bang");
-check("the version has three numbers", /^\d+\.\d+\.\d+$/.test(manifest.version), true);
+check("the version is a test build for dnd5e 6 (x.y.z-dev.n)", /^\d+\.\d+\.\d+-dev\.\d+$/.test(manifest.version), true);
 check("the latest CHANGELOG section is the manifest version", changelog.match(/^## (\S+)/m)?.[1], manifest.version);
 check("the download URL matches the version", manifest.download, `https://github.com/${repo}/releases/download/v${manifest.version}/module.zip`);
-check("the manifest URL points to the latest release", manifest.manifest, `https://github.com/${repo}/releases/latest/download/module.json`);
+check("the manifest URL is fixed to this pre-release, never to the latest stable release", manifest.manifest, `https://github.com/${repo}/releases/download/v${manifest.version}/module.json`);
+check("this build declares dnd5e 6 only", manifest.relationships.systems.find(x => x.id === "dnd5e")?.compatibility?.minimum, "6.0.6");
 check("the compatibility minimum is set", typeof manifest.compatibility?.minimum, "string");
 check("socket is enabled", manifest.socket, true);
 
